@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + Lit + TS</title>
     <link rel="stylesheet" href="./src/index.css" />
-    <script type="module" src="/src/my-element.ts"></script>
+    <script type="module" src="/src/bm-viewer.ts"></script>
   </head>
   <body>
-    <my-element>
-      <h1>Vite + Lit</h1>
-    </my-element>
+    <div style="height: 500px; width: 500px;">
+      <bm-viewer modelSrc="/assets/gltf/Mbtr_Shirt_v2.glb" >
+      </bm-viewer>
+    </div>
   </body>
 </html>
