@@ -7,8 +7,9 @@ export default defineConfig({
       entry: "src/my-element.ts",
       formats: ["es"],
     },
-    // rollupOptions: {
-    //   external: /^lit/
-    // }
+    rollupOptions: {
+      // external: /^lit/
+    },
   },
+  plugins: [],
 });

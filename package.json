@@ -7,7 +7,6 @@
     ".": "./dist/my-element.es.js"
   },
   "types": "types/my-element.d.ts",
-
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build"
@@ -17,8 +16,9 @@
   "dependencies": {
     "@emotion/styled": "^11.10.0",
     "@mui/joy": "^5.0.0-alpha.39",
+    "lit": "^2.2.8",
     "three": "^0.143.0",
-    "lit": "^2.2.8"
+    "three-mesh-bvh": "^0.5.15"
   },
   "devDependencies": {
     "@types/three": "^0.143.0",
