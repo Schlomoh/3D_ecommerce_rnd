@@ -1,10 +1,9 @@
 import { PerspectiveCamera, WebGLRenderer } from "three";
 import ModelScene from ".././ModelScene";
-import { ClickHandler, WindowHandler } from ".././utils";
+import { WindowHandler } from ".././utils";
 
 class ModelRenderer extends WebGLRenderer {
   protected camera: PerspectiveCamera;
-  protected clickHandler: ClickHandler;
   protected windowHandler: WindowHandler;
   container: HTMLElement;
   scene: ModelScene;
@@ -18,7 +17,6 @@ class ModelRenderer extends WebGLRenderer {
     this.camera = scene.camera;
     this.camera.position.set(0, 0, -1);
 
-    this.clickHandler = new ClickHandler(this.scene, this.domElement);
     this.windowHandler = new WindowHandler(this);
   }
 
