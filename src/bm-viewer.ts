@@ -1,21 +1,20 @@
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
-import { Renderer, ModelScene } from "./components";
+import { ModelRenderer, HotspotRenderer, ModelScene } from "./components";
 
 @customElement("bm-viewer")
 export class BMV extends LitElement {
-  renderer: Renderer;
-  scene: ModelScene;
   @property({ type: String })
   modelSrc: string = "";
+
+  private scene: ModelScene = new ModelScene();
+  private hotspotRenderer = new HotspotRenderer(this.scene);
+  private modelRenderer = new ModelRenderer(this.scene);
 
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
-
-    this.scene = new ModelScene();
-    this.renderer = new Renderer(this.scene);
   }
 
   static styles = css`
@@ -25,14 +24,28 @@ export class BMV extends LitElement {
     }
   `;
 
+  protected start() {
+    const animate = () => {
+      console.log('frame')
+      requestAnimationFrame(animate);
+      this.hotspotRenderer.controls.update();
+      this.modelRenderer.render(this.scene, this.scene.camera);
+      this.hotspotRenderer.render(this.scene, this.scene.camera);
+    };
+    animate()
+  }
+
   protected firstUpdated(_changedProperties: PropertyValues): void {
     super.firstUpdated(_changedProperties);
     // wait for first update so the viewer wrapper element has been rendered
     // and can be accessed
     const container = this.shadowRoot?.getElementById("viewer")!;
     this.scene.loadModel(this.modelSrc);
-    this.renderer.connect(container);
-    this.renderer.start();
+
+    this.hotspotRenderer.connect(container);
+    this.modelRenderer.connect(container);
+
+    this.start();
   }
 
   render() {

@@ -1,17 +1,6 @@
-import {
-  AmbientLight,
-  Group,
-  PerspectiveCamera,
-  PointLight,
-  Scene,
-} from "three";
-import Loader from "./Loader";
+import { AmbientLight, PerspectiveCamera, PointLight, Scene } from "three";
 
-interface ModelScene {
-  loader: Loader;
-  model: Group;
-  camera: PerspectiveCamera;
-}
+import Loader from "./Loader";
 
 interface Vec3 {
   x: number;
@@ -20,15 +9,16 @@ interface Vec3 {
 }
 
 class ModelScene extends Scene {
+  private loader = new Loader(this);
+  camera = new PerspectiveCamera();
+
   constructor() {
     super();
-    this.loader = new Loader(this);
-    this.camera = new PerspectiveCamera();
 
     const ambLight = new AmbientLight("#fff", 0.3);
     this.add(ambLight);
 
-    this.addPointLight("f656ff", { x: -1, y: 1, z: 0.7 });
+    this.addPointLight("#f656ff", { x: -1, y: 1, z: 0.7 });
     this.addPointLight("#3d5aff", { x: 1, y: 1, z: 0.7 });
     this.addPointLight("#fff", { x: 0, y: -1, z: -0.8 }, 0.3);
   }
