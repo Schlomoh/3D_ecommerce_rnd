@@ -1,4 +1,5 @@
 import { AmbientLight, PerspectiveCamera, PointLight, Scene } from "three";
+import Animations from "./Animations";
 
 import Loader from "./Loader";
 
@@ -9,11 +10,15 @@ interface Vec3 {
 }
 
 class ModelScene extends Scene {
-  private loader = new Loader(this);
+  private loader: Loader;
   camera = new PerspectiveCamera();
+  animationManager = new Animations();
+  modelReady: boolean = false;
 
   constructor() {
     super();
+
+    this.loader = new Loader(this, this.animationManager);
 
     const ambLight = new AmbientLight("#fff", 0.3);
     this.add(ambLight);

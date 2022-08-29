@@ -1,6 +1,6 @@
 import { Raycaster } from "three";
-import Hotspot from "../../Hotspot";
 import { HotspotRenderer } from "../../renderers";
+import Hotspot from "../../Hotspot";
 
 class ClickHandler {
   private renderer: HotspotRenderer;
@@ -26,13 +26,13 @@ class ClickHandler {
     const scene = this.renderer.scene;
     const pointer = this.getNormalizedCoords(e);
     this.raycaster.setFromCamera(pointer, scene.camera);
-    const intersects = this.raycaster.intersectObjects(scene.children, true);
-
-    const hotspot = new Hotspot();
-    this.renderer.hotspots.push(hotspot);
-    hotspot.connectTo(intersects[0].object, intersects[0].point);
-
-    console.log(intersects);
+    const intersects = this.raycaster.intersectObjects(scene.children);
+    if (intersects.length > 0) {
+      const hotspot = new Hotspot();
+      this.renderer.hotspots.push(hotspot);
+      console.log(intersects);
+      hotspot.connectTo(this.renderer.scene, intersects[0].point);
+    }
   }
 }
 
