@@ -1,41 +1,58 @@
 import { css, html, LitElement, PropertyValues } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
+import { Clock } from "three";
 
-import Stats from 'three/examples/jsm/libs/stats.module'
+import playIcon from "./assets/playIconSvg";
+import pauseIcon from "./assets/pauseIconSvg";
 
-import { ModelRenderer, HotspotRenderer, ModelScene } from "./components";
+import Stats from "three/examples/jsm/libs/stats.module";
+
+import {
+  ModelRenderer,
+  HotspotRenderer,
+  ModelScene,
+  Animations,
+} from "./components";
 
 @customElement("bm-viewer")
 export class BMV extends LitElement {
   @property({ type: String })
   modelSrc: string = "";
 
+  @state()
+  play: boolean = true;
+
+  @state()
+  playButtonIcon = playIcon;
+
+  private animations: Animations;
   private scene: ModelScene = new ModelScene();
   private hotspotRenderer = new HotspotRenderer(this.scene);
   private modelRenderer = new ModelRenderer(this.scene);
-  private stats = Stats()
+  private stats = Stats();
 
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+
+    this.animations = this.scene.animationManager;
   }
 
-  static styles = css`
-    #viewer {
-      width: 100%;
-      height: 100%;
-    }
-  `;
-
   protected start() {
+    const clock = new Clock();
     const animate = () => {
       requestAnimationFrame(animate);
-      this.stats.update()
+
+      if (this.scene.modelReady && this.animations.animationMixer) {
+        this.animations.animationMixer.update(clock.getDelta());
+      }
+
+      this.stats.update();
       this.hotspotRenderer.update();
       this.modelRenderer.render(this.scene, this.scene.camera);
       this.hotspotRenderer.render(this.scene, this.scene.camera);
     };
-    animate()
+    animate();
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -44,18 +61,85 @@ export class BMV extends LitElement {
     // and can be accessed
     const container = this.shadowRoot?.getElementById("viewer")!;
 
-    container.appendChild(this.stats.domElement)
+    container.appendChild(this.stats.domElement);
 
     this.scene.loadModel(this.modelSrc);
 
     this.hotspotRenderer.connect(container);
     this.modelRenderer.connect(container);
 
-
     this.start();
   }
 
+  onPlayButtonClick() {
+    console.log("click");
+    this.play = !this.play;
+    this.playButtonIcon = this.play ? playIcon : pauseIcon;
+  }
+
+  static styles = css`
+    #viewerContainer {
+      width: 100%;
+      height: 100%;
+    }
+
+    #viewerContainer button {
+      position: absolute;
+      border: none;
+      border-radius: 50%;
+      z-index: 30000;
+      cursor: pointer;
+    }
+
+    #viewerContainer .playButton {
+      width: 30px;
+      height: 30px;
+      bottom: 0;
+      right: 0;
+      margin: 20px;
+      fill: #fff;
+      padding: 8px 11px;
+    }
+
+    #viewerContainer .playButton > svg {
+      height: 10px;
+      width: 10px;
+    }
+
+    #viewer {
+      width: 100%;
+      height: 100%;
+    }
+  `;
+
   render() {
-    return html` <div id="viewer"></div> `;
+    return html`
+      <div id="viewerContainer">
+        <button @click=${this.onPlayButtonClick} class="playButton">
+          ${this.playButtonIcon}
+        </button>
+        <div id="viewer"></div>
+      </div>
+    `;
   }
 }
+
+// export type Constructor<T = object, U = object> = {
+//   new (...args: any[]): T;
+//   prototype: T;
+// } & U;
+
+// interface myI {
+// }
+
+// export const ControlsMixin = <T extends Constructor<BMV>>(
+//   BMVElement: T
+// ): Constructor<myI> & T => {
+//   class MyNewMixinElement extends BMVElement {
+
+//     bla() {
+//       return 0
+//     }
+//   }
+//   return MyNewMixinElement
+// };
