@@ -5,8 +5,6 @@ class Animations {
   animationMixer: AnimationMixer | undefined;
   animationActions: AnimationAction[] = [];
 
-  constructor() {}
-
   init(rootModel: Object3D<Event>) {
     this.animationMixer = new AnimationMixer(rootModel);
   }

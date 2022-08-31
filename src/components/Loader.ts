@@ -30,7 +30,6 @@ class Loader {
 
     this.scene.add(model);
     this.scene.modelReady = true;
-    this.animationManager.animationActions[0].play();
     // self.scene.add(gltf.scene);
   }
 

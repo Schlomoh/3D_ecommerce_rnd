@@ -20,7 +20,7 @@ export class BMV extends LitElement {
   modelSrc: string = "";
 
   @state()
-  play: boolean = true;
+  playing: boolean = false;
 
   @state()
   playButtonIcon = playIcon;
@@ -72,9 +72,15 @@ export class BMV extends LitElement {
   }
 
   onPlayButtonClick() {
-    console.log("click");
-    this.play = !this.play;
-    this.playButtonIcon = this.play ? playIcon : pauseIcon;
+    if (this.playing) {
+      this.animations.animationActions[0].fadeOut(.25);
+      // this.animations.animationActions[0].stop();
+    } else {
+      this.animations.animationActions[0].stop();
+      this.animations.animationActions[0].play();
+    }
+    this.playing = !this.playing;
+    this.playButtonIcon = this.playing ? pauseIcon : playIcon;
   }
 
   static styles = css`
