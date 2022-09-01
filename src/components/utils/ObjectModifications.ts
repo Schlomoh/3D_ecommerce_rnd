@@ -1,4 +1,4 @@
-import { Box3, Event, Group, Matrix4, Mesh, Object3D, Vector3 } from "three";
+import { Box3, Event, Group, Mesh, Object3D, Vector3 } from "three";
 import { acceleratedRaycast, MeshBVH } from "three-mesh-bvh";
 
 class ObjectModifications {
@@ -27,18 +27,14 @@ class ObjectModifications {
     // const bbox = new BoxHelper(object, '#fff'); // visible bounding box
     const box = new Box3().setFromObject(object); // bounding box
     const boxCenter = new Vector3();
-    const translationMatrix = new Matrix4();
 
     box.getCenter(boxCenter);
     const transformation = boxCenter.multiplyScalar(-1);
-    
-    translationMatrix.makeTranslation(
-      transformation.x,
-      transformation.y,
-      transformation.z
-    );
 
-    object.applyMatrix4(translationMatrix);
+    object.translateX(transformation.x);
+    object.translateY(transformation.y);
+    object.translateZ(transformation.z);
+
     // scene.add(bbox) // add visible bounding box to scene
 
     return object;
