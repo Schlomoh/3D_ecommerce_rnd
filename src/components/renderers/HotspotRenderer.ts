@@ -1,10 +1,16 @@
-import { PerspectiveCamera, Raycaster } from "three";
+import { PerspectiveCamera, Raycaster, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 import Hotspot from "../Hotspot";
 import ModelScene from "../ModelScene";
 import { ClickHandler, WindowHandler } from "../utils";
 
+/**
+ * The 2D-renderer responsible for rendering the hotspot 2D-objects
+ *
+ * This second dom element gets placed 'above' the scene renderers (webGL2 renderer)
+ * which then also has to handle the orbit controls
+ */
 class HotspotRenderer extends CSS2DRenderer {
   protected camera: PerspectiveCamera;
   protected clickHandler: ClickHandler;
@@ -36,28 +42,53 @@ class HotspotRenderer extends CSS2DRenderer {
     this.raycaster.firstHitOnly = true;
   }
 
+  /**
+   * create a string out of rounded position coordinates
+   *
+   * @param coord - a vector defining a point position
+   * @returns - a string combining the rounded value of each axis coord
+   */
+  private roundCoord(coord: Vector3) {
+    const decimalPosition = 6;
+    return (
+      coord.x.toPrecision(decimalPosition) +
+      coord.y.toPrecision(decimalPosition) +
+      coord.z.toPrecision(decimalPosition)
+    );
+  }
+
+  /**
+   * updates the visibility of each hotspot using raycasting
+   *
+   * also updates the orbit controls... since the 2D-renderers dom object
+   * is placed 'above' the scene renderers
+   */
   update() {
-    // let intersects, cameraPosition, hotspotPosition, direction, hit;
-    // this.hotspots.forEach((hotspot) => {
-    //   cameraPosition = this.camera.position.clone();
-    //   hotspotPosition = hotspot.position.clone();
-    //   direction = hotspotPosition.clone().sub(cameraPosition);
+    // check which of the hotspots is visible using raycasting
+    let intersects, cameraPosition, hotspotPosition, direction, hit;
+    this.hotspots.forEach((hotspot) => {
+      cameraPosition = this.camera.position.clone();
+      hotspotPosition = hotspot.position.clone();
+      direction = hotspotPosition.clone().sub(cameraPosition);
 
-    //   this.raycaster.set(cameraPosition, direction);
-    //   intersects = this.raycaster.intersectObjects(this.scene.children);
-    //   hit = intersects[0];
+      this.raycaster.set(cameraPosition, direction);
+      intersects = this.raycaster.intersectObjects(this.scene.children);
 
-    //   const roundedHitPos = new Vector3(
-    //     Number(hit.point.x.toPrecision(1)),
-    //     Number(hit.point.y.toPrecision(1)),
-    //     Number(hit.point.z.toPrecision(1))
-    //   );
+      // if an intersection occurs the ray hit and hotspot position are compared
+      // they are first converted into strings and update the hotspot 'show' prop
+      // accordigly
+      if (intersects.length > 0) {
+        hit = intersects[0].point.clone();
+        hit             = this.roundCoord(hit); // prettier-ignore
+        hotspotPosition = this.roundCoord(hotspotPosition);
 
-    //   if (hit) {
-    //     console.log("hit: ", roundedHitPos);
-    //     console.log("point: ", hotspotPosition);
-    //   }
-    // });
+        if (hit == hotspotPosition) {
+          if (!hotspot.show) hotspot.show = true;
+        } else {
+          if (hotspot.show) hotspot.show = false;
+        }
+      }
+    });
 
     this.controls.update();
   }
