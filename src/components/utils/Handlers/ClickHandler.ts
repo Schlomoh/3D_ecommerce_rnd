@@ -25,12 +25,13 @@ class ClickHandler {
   doubleClickCallback(e: MouseEvent) {
     const scene = this.renderer.scene;
     const pointer = this.getNormalizedCoords(e);
+
     this.raycaster.setFromCamera(pointer, scene.camera);
     const intersects = this.raycaster.intersectObjects(scene.children);
+
     if (intersects.length > 0) {
-      const hotspot = new Hotspot();
+      const hotspot = new Hotspot(this.renderer.controls);
       this.renderer.hotspots.push(hotspot);
-      console.log(intersects);
       hotspot.connectTo(this.renderer.scene, intersects[0].point);
     }
   }

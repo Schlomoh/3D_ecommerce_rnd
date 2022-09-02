@@ -73,7 +73,7 @@ export class BMV extends LitElement {
 
   onPlayButtonClick() {
     if (this.playing) {
-      this.animations.animationActions[0].fadeOut(.25);
+      this.animations.animationActions[0].fadeOut(0.25);
       // this.animations.animationActions[0].stop();
     } else {
       this.animations.animationActions[0].stop();
