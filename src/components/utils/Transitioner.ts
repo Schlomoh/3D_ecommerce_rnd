@@ -2,12 +2,14 @@ import { Vector3 } from "three";
 import Hotspot from "../Hotspot";
 
 class Transitioner {
+  private hotspot: Hotspot;
   private duration: number;
   private alpha: number;
-  _startCoord = new Vector3();
+  _startCoords = { target: new Vector3(), camera: new Vector3() };
   finished = false;
 
-  constructor(duration: number) {
+  constructor(hotspot: Hotspot, duration: number) {
+    this.hotspot = hotspot;
     this.duration = duration;
     this.alpha = 0;
   }
@@ -20,26 +22,35 @@ class Transitioner {
     );
   }
 
-  linear(hotspot: Hotspot) {
+  linear(camEndPos: Vector3) {
     this.alpha += 1 / (this.duration * 60);
-    const endCoord = hotspot.position;
+    const endTarget = this.hotspot.position.clone();
 
+    // new position reached - reset alpha and disable focus
     if (this.alpha >= 1) {
-      hotspot.focus = false;
+      this.hotspot.focus = false;
       this.alpha = 0;
-      return hotspot.position; // end position
-    } else {
-      return this.lerp(this._startCoord, endCoord); // way inbetween
+      return [endTarget, camEndPos]; // end position: ;
+    }
+    // esle transition is ongoing
+    else {
+      const target = this.lerp(this._startCoords.target, endTarget); // way inbetween
+      const newCamPosition = this.lerp(this._startCoords.camera, camEndPos);
+      return [target, newCamPosition];
     }
   }
 
   ease(hotspot: Hotspot) {
     const endCoord = hotspot.position;
-    return this.lerp(this._startCoord, endCoord);
+    return this.lerp(this._startCoords.target, endCoord);
   }
 
-  set startCoord(val: Vector3) {
-    this._startCoord = val;
+  set startTarget(val: Vector3) {
+    this._startCoords.target = val;
+  }
+
+  set startCameraPos(val: Vector3) {
+    this._startCoords.camera = val;
   }
 }
 

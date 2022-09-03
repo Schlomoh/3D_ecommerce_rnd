@@ -1,7 +1,7 @@
 import { LitElement, PropertyValues } from "lit";
 export declare class BMV extends LitElement {
     modelSrc: string;
-    play: boolean;
+    playing: boolean;
     playButtonIcon: import("lit-html").TemplateResult<1>;
     private animations;
     private scene;

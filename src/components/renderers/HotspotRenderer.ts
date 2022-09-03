@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Raycaster, Vector3 } from "three";
+import { Box3, PerspectiveCamera, Raycaster, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
@@ -48,7 +48,25 @@ class HotspotRenderer extends CSS2DRenderer {
   }
 
   private focusHotspot(hotspot: Hotspot) {
-    this.controls.target = hotspot.transitioner.linear(hotspot);
+    // calc the point in line with hotspot and center of object
+    if (hotspot.associatedObject) {
+      //center coord
+      const center = new Vector3();
+      const hotspotPosition = hotspot.position.clone();
+      // boundingBox
+      const box = new Box3().setFromObject(hotspot.associatedObject);
+      box.getCenter(center);
+      // direction of hotspot -> center of object to always make cam face object
+      const direction = center.sub(hotspotPosition);
+      // outer position of camera (camera end position)
+      const newCamPosition = hotspotPosition.add(
+        direction.normalize().multiplyScalar(-0.5)
+      );
+
+      const [target, cameraPos] = hotspot.transitioner.linear(newCamPosition);
+      this.controls.target = target;
+      this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
+    }
   }
 
   /**
@@ -66,7 +84,7 @@ class HotspotRenderer extends CSS2DRenderer {
      * @returns - a string combining the rounded value of each axis coord
      */
     function roundCoord(coord: Vector3) {
-      const decimalPosition = 6;
+      const decimalPosition = 5;
       return (
         coord.x.toPrecision(decimalPosition) +
         coord.y.toPrecision(decimalPosition) +
@@ -108,11 +126,11 @@ class HotspotRenderer extends CSS2DRenderer {
    * calls 'focus hotspot' if one is clicked
    */
   update() {
-    this.hotspots.forEach((hotspot) => {
+    for (let i = 0; i < this.hotspots.length; i++) {
+      const hotspot = this.hotspots[i];
       this.updateHotspotVisibility(hotspot);
       if (hotspot.focus) this.focusHotspot(hotspot);
-    });
-
+    }
     this.controls.update();
   }
 

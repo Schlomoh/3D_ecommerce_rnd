@@ -1,6 +1,7 @@
-import { Event, Object3D, Vector3 } from "three";
+import { Event, Intersection, Object3D, PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
+import { HotspotRenderer } from "./renderers";
 import { Transitioner } from "./utils";
 
 const dotSize = 15;
@@ -16,18 +17,24 @@ const baseStyle = `
 
 class Hotspot extends CSS2DObject {
   private _show: boolean = true;
+  private renderer: HotspotRenderer;
+  private camera: PerspectiveCamera;
   private controls: OrbitControls;
-  focus: boolean = false;
-  transitioner: Transitioner = new Transitioner(0.25);
-  element: HTMLDivElement;
 
-  constructor(controls: OrbitControls) {
+  focus: boolean = false;
+  transitioner: Transitioner = new Transitioner(this, 0.25);
+  element: HTMLDivElement;
+  associatedObject?: Object3D<Event>;
+
+  constructor(renderer: HotspotRenderer) {
     const element = document.createElement("div");
     element.className = "hotspot";
     element.style.cssText = baseStyle;
     super(element);
 
-    this.controls = controls;
+    this.renderer = renderer;
+    this.controls = this.renderer.controls;
+    this.camera = this.renderer.scene.camera;
 
     this.element = element;
     this.element.addEventListener("pointerdown", () => this.handleClick());
@@ -37,7 +44,8 @@ class Hotspot extends CSS2DObject {
 
   private handleClick() {
     this.focus = true;
-    this.transitioner.startCoord = this.controls.target;
+    this.transitioner.startTarget = this.controls.target.clone();
+    this.transitioner.startCameraPos = this.camera.position.clone();
   }
 
   private updateStyle() {
@@ -45,9 +53,13 @@ class Hotspot extends CSS2DObject {
     this.element.style.opacity = this._show ? "1" : ".1";
   }
 
-  connectTo(target: Object3D<Event>, position: Vector3) {
+  connectTo(target: Object3D<Event>, intersection: Intersection) {
+    const position = intersection.point;
+    const object = intersection.object;
+
     const [x, y, z] = [position.x, position.y, position.z];
     this.position.set(x, y, z);
+    this.associatedObject = object;
     target.add(this);
   }
 

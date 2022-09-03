@@ -30,9 +30,10 @@ class ClickHandler {
     const intersects = this.raycaster.intersectObjects(scene.children);
 
     if (intersects.length > 0) {
-      const hotspot = new Hotspot(this.renderer.controls);
+      const hotspot = new Hotspot(this.renderer);
+      const firstIntersect = intersects[0];
       this.renderer.hotspots.push(hotspot);
-      hotspot.connectTo(this.renderer.scene, intersects[0].point);
+      hotspot.connectTo(this.renderer.scene, firstIntersect);
     }
   }
 }
