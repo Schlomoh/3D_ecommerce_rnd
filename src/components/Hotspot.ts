@@ -21,8 +21,9 @@ class Hotspot extends CSS2DObject {
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
 
-  focus: boolean = false;
-  transitioner: Transitioner = new Transitioner(this, 0.25);
+  focus: boolean = false; // true while focusing
+  focused: boolean = false; // true after focusing
+  transitioner: Transitioner = new Transitioner(this, 1);
   element: HTMLDivElement;
   associatedObject?: Object3D<Event>;
 
@@ -43,9 +44,14 @@ class Hotspot extends CSS2DObject {
   }
 
   private handleClick() {
-    this.focus = true;
-    this.transitioner.startTarget = this.controls.target.clone();
-    this.transitioner.startCameraPos = this.camera.position.clone();
+    if (!this.focused) {
+      this.renderer.prevHotspot && (this.renderer.prevHotspot.focused = false); // 'unfocus' previous hotspot
+      this.focus = true;
+      this.focused = true;
+      this.renderer.prevHotspot = this;
+      this.transitioner.startTarget = this.controls.target.clone();
+      this.transitioner.startCameraPos = this.camera.position.clone();
+    }
   }
 
   private updateStyle() {
