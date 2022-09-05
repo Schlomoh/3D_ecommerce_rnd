@@ -1,4 +1,4 @@
-import { AmbientLight, PerspectiveCamera, PointLight, Scene } from "three";
+import { AmbientLight, Color, PerspectiveCamera, PointLight, Scene } from "three";
 import Animations from "./Animations";
 
 import Loader from "./Loader";
@@ -20,12 +20,15 @@ class ModelScene extends Scene {
 
     this.loader = new Loader(this, this.animationManager);
 
-    const ambLight = new AmbientLight("#fff", 0.3);
+    const ambLight = new AmbientLight("#fff", .8);
     this.add(ambLight);
 
     this.addPointLight("#f656ff", { x: -1, y: 1, z: 0.7 });
     this.addPointLight("#3d5aff", { x: 1, y: 1, z: 0.7 });
     this.addPointLight("#fff", { x: 0, y: -1, z: -0.8 }, 0.3);
+
+    this.background = new Color('#fff')
+
   }
 
   private addPointLight(color: string, position: Vec3, intensity?: number) {

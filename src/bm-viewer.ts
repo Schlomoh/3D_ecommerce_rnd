@@ -1,4 +1,4 @@
-import { css, html, LitElement, PropertyValues } from "lit";
+import { html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { Clock } from "three";
 
@@ -12,7 +12,11 @@ import {
   HotspotRenderer,
   ModelScene,
   Animations,
+  Hotspot,
+  viewerCss,
 } from "./components";
+
+type AddHotspotEvent = CustomEvent<{ hotspot: Hotspot }>;
 
 @customElement("bm-viewer")
 export class BMV extends LitElement {
@@ -20,20 +24,25 @@ export class BMV extends LitElement {
   modelSrc: string = "";
 
   @state()
-  playing: boolean = false;
+  playing = false;
 
   @state()
-  playButtonIcon = playIcon;
+  private showHotspotConfig = false;
 
   private animations: Animations;
   private scene: ModelScene = new ModelScene();
   private hotspotRenderer = new HotspotRenderer(this.scene);
   private modelRenderer = new ModelRenderer(this.scene);
+  private currentHotspot?: Hotspot;
   private stats = Stats();
 
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+
+    this.hotspotRenderer.domElement.addEventListener("addedHotspot", (e) =>
+      this.onAddHotspot(e as AddHotspotEvent)
+    );
 
     this.animations = this.scene.animationManager;
   }
@@ -60,92 +69,90 @@ export class BMV extends LitElement {
     // wait for first update so the viewer wrapper element has been rendered
     // and can be accessed
     const container = this.shadowRoot?.getElementById("viewer")!;
-
     container.appendChild(this.stats.domElement);
-
-    this.scene.loadModel(this.modelSrc);
-
     this.hotspotRenderer.connect(container);
     this.modelRenderer.connect(container);
 
+    this.scene.loadModel(this.modelSrc);
+
     this.start();
+  }
+
+  protected updated(_changedProperties: PropertyValues): void {
+    super.updated(_changedProperties);
+
+    if (this.shadowRoot) {
+      const hotspotConfig = this.shadowRoot.getElementById("hotspotConfig");
+      if (hotspotConfig) {
+        if (this.showHotspotConfig) {
+          hotspotConfig.style.right = "0px";
+        } else if (!this.showHotspotConfig) {
+          hotspotConfig.style.right = "calc(0px - 35vw)";
+        }
+      }
+    }
   }
 
   onPlayButtonClick() {
     if (this.playing) {
       this.animations.animationActions[0].fadeOut(0.25);
-      // this.animations.animationActions[0].stop();
     } else {
       this.animations.animationActions[0].stop();
       this.animations.animationActions[0].play();
     }
     this.playing = !this.playing;
-    this.playButtonIcon = this.playing ? pauseIcon : playIcon;
   }
 
-  static styles = css`
-    #viewerContainer {
-      width: 100%;
-      height: 100%;
-    }
+  cancelHotspot() {
+    const index = Object.keys(this.hotspotRenderer.hotspots).length;
+    delete this.hotspotRenderer.hotspots[index];
+    if (this.currentHotspot) this.scene.remove(this.currentHotspot);
+    this.showHotspotConfig = false;
+  }
 
-    #viewerContainer button {
-      position: absolute;
-      border: none;
-      border-radius: 50%;
-      z-index: 30000;
-      cursor: pointer;
-    }
+  onAddHotspot(e: AddHotspotEvent) {
+    this.currentHotspot = e.detail.hotspot;
+    this.showHotspotConfig = true;
+  }
 
-    #viewerContainer .playButton {
-      width: 30px;
-      height: 30px;
-      bottom: 0;
-      right: 0;
-      margin: 20px;
-      fill: #fff;
-      padding: 8px 11px;
-    }
+  onHotspotConfigSubmit(e: SubmitEvent) {
+    e.preventDefault();
+    const form = this.shadowRoot?.getElementById('configHotspotForm') as HTMLFormElement // prettier-ignore
+    const title = form.elements.namedItem("title") as HTMLInputElement;
+    const desc = form.elements.namedItem("desc") as HTMLTextAreaElement;
 
-    #viewerContainer .playButton > svg {
-      height: 10px;
-      width: 10px;
-    }
+    const data = { title: title.value, desc: desc.value, media: null };
 
-    #viewer {
-      width: 100%;
-      height: 100%;
-    }
-  `;
+    const event = new CustomEvent("submitHotspot", { detail: { data: data } });
+    this.hotspotRenderer.domElement.dispatchEvent(event);
+
+    title.value = desc.value = "";
+
+    this.showHotspotConfig = false;
+  }
+
+  static styles = viewerCss;
 
   render() {
     return html`
       <div id="viewerContainer">
-        <button @click=${this.onPlayButtonClick} class="playButton">
-          ${this.playButtonIcon}
+        <div id="hotspotConfig">
+          <form @submit=${this.onHotspotConfigSubmit} id="configHotspotForm">
+            <button @click=${this.cancelHotspot} class="cancelButton">
+              Cancel
+            </button>
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" />
+            <label for="desc">Description</label>
+            <textarea id="desc" rows="10"></textarea>
+            <button type="submit">Add hotspot</button>
+          </form>
+        </div>
+        <button @click=${this.onPlayButtonClick} class="playButton float">
+          ${this.playing ? pauseIcon : playIcon}
         </button>
         <div id="viewer"></div>
       </div>
     `;
   }
 }
-
-// export type Constructor<T = object, U = object> = {
-//   new (...args: any[]): T;
-//   prototype: T;
-// } & U;
-
-// interface myI {
-// }
-
-// export const ControlsMixin = <T extends Constructor<BMV>>(
-//   BMVElement: T
-// ): Constructor<myI> & T => {
-//   class MyNewMixinElement extends BMVElement {
-
-//     bla() {
-//       return 0
-//     }
-//   }
-//   return MyNewMixinElement
-// };
