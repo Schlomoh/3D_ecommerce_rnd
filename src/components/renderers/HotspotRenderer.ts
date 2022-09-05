@@ -10,16 +10,17 @@ import { ClickHandler, WindowHandler } from "../utils";
  * The 2D-renderer responsible for rendering the hotspot 2D-objects
  *
  * This second dom element gets placed 'above' the scene renderers (webGL2 renderer)
- * which then also has to handle the orbit controls
+ * and also has to handle the orbit controls
  */
 class HotspotRenderer extends CSS2DRenderer {
   protected camera: PerspectiveCamera;
-  protected clickHandler: ClickHandler;
   protected windowHandler: WindowHandler;
   protected raycaster = new Raycaster();
+  protected clickHandler: ClickHandler;
   controls: OrbitControls;
   scene: ModelScene;
-  hotspots: Hotspot[];
+  hotspots: { [key: number]: Hotspot };
+  prevHotspot?: Hotspot;
   container?: HTMLElement;
 
   constructor(scene: ModelScene) {
@@ -27,7 +28,7 @@ class HotspotRenderer extends CSS2DRenderer {
     this.scene = scene;
     this.camera = scene.camera;
 
-    //position dom element on top
+    //position dom element above scene renderer
     this.domElement.style.position = "absolute";
     this.domElement.style.top = "0px";
 
@@ -39,7 +40,7 @@ class HotspotRenderer extends CSS2DRenderer {
     this.controls.dampingFactor = 0.1;
 
     // register event handlers
-    this.clickHandler = new ClickHandler(this, this.domElement);
+    this.clickHandler = new ClickHandler(this);
     this.windowHandler = new WindowHandler(this);
 
     // hotspots and raycasting
@@ -63,7 +64,7 @@ class HotspotRenderer extends CSS2DRenderer {
         direction.normalize().multiplyScalar(-0.5)
       );
 
-      const [target, cameraPos] = hotspot.transitioner.linear(newCamPosition);
+      const [target, cameraPos] = hotspot.transitioner.ease(newCamPosition);
       this.controls.target = target;
       this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
     }
@@ -126,8 +127,9 @@ class HotspotRenderer extends CSS2DRenderer {
    * calls 'focus hotspot' if one is clicked
    */
   update() {
-    for (let i = 0; i < this.hotspots.length; i++) {
-      const hotspot = this.hotspots[i];
+    for (let i = 0; i < Object.keys(this.hotspots).length; i++) {
+      const index = Number(Object.keys(this.hotspots)[i]); // get id from hotspot as index
+      const hotspot = this.hotspots[index];
       this.updateHotspotVisibility(hotspot);
       if (hotspot.focus) this.focusHotspot(hotspot);
     }
