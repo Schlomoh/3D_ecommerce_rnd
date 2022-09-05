@@ -4,7 +4,7 @@ import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
 import Hotspot from "../Hotspot";
 import ModelScene from "../ModelScene";
-import { ClickHandler, WindowHandler } from "../utils";
+import { HotspotCreator, WindowHandler } from "../utils";
 
 /**
  * The 2D-renderer responsible for rendering the hotspot 2D-objects
@@ -15,8 +15,8 @@ import { ClickHandler, WindowHandler } from "../utils";
 class HotspotRenderer extends CSS2DRenderer {
   protected camera: PerspectiveCamera;
   protected windowHandler: WindowHandler;
+  protected hotspotCreator: HotspotCreator;
   protected raycaster = new Raycaster();
-  protected clickHandler: ClickHandler;
   controls: OrbitControls;
   scene: ModelScene;
   hotspots: { [key: number]: Hotspot };
@@ -40,7 +40,7 @@ class HotspotRenderer extends CSS2DRenderer {
     this.controls.dampingFactor = 0.1;
 
     // register event handlers
-    this.clickHandler = new ClickHandler(this);
+    this.hotspotCreator = new HotspotCreator(this);
     this.windowHandler = new WindowHandler(this);
 
     // hotspots and raycasting

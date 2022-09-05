@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "three";
-import { HotspotRenderer, ModelRenderer } from "../../renderers";
+import { HotspotRenderer, ModelRenderer } from "../renderers";
 
 class WindowHandler {
   renderer: HotspotRenderer | ModelRenderer;
