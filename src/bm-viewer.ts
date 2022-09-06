@@ -15,6 +15,9 @@ import {
   Hotspot,
   viewerCss,
 } from "./components";
+import { StyleUpdater } from "./components/utils";
+import closeIcon from "./assets/closeIconSvg";
+import { HotspotClickEvent } from "./components/Hotspot";
 
 type AddHotspotEvent = CustomEvent<{ hotspot: Hotspot }>;
 
@@ -29,11 +32,15 @@ export class BMV extends LitElement {
   @state()
   private showHotspotConfig = false;
 
+  @state()
+  private focusedHotspot = false;
+
   private animations: Animations;
   private scene: ModelScene = new ModelScene();
   private hotspotRenderer = new HotspotRenderer(this.scene);
   private modelRenderer = new ModelRenderer(this.scene);
-  private currentHotspot?: Hotspot;
+  private lastCreatedHotspot?: Hotspot;
+  private styleUpdater: StyleUpdater;
   private stats = Stats();
 
   constructor() {
@@ -44,7 +51,10 @@ export class BMV extends LitElement {
       this.onAddHotspot(e as AddHotspotEvent)
     );
 
+    this.hotspotRenderer.domElement.addEventListener('clickedHotspot', (e) => this.onClickedHotspot(e as HotspotClickEvent))
+
     this.animations = this.scene.animationManager;
+    this.styleUpdater = new StyleUpdater(this.shadowRoot);
   }
 
   protected start() {
@@ -80,17 +90,14 @@ export class BMV extends LitElement {
 
   protected updated(_changedProperties: PropertyValues): void {
     super.updated(_changedProperties);
+    console.log(this.showHotspotConfig);
 
-    if (this.shadowRoot) {
-      const hotspotConfig = this.shadowRoot.getElementById("hotspotConfig");
-      if (hotspotConfig) {
-        if (this.showHotspotConfig) {
-          hotspotConfig.style.right = "0px";
-        } else if (!this.showHotspotConfig) {
-          hotspotConfig.style.right = "calc(0px - 35vw)";
-        }
-      }
-    }
+    if (this.showHotspotConfig) this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '0px' );
+    else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', 'calc(-50vw - 15px - 20px)'); // prettier-ignore
+
+    if (this.focusedHotspot)
+      this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
+    else this.styleUpdater.updateStyle("cancelFocus", "top", "-50px");
   }
 
   onPlayButtonClick() {
@@ -106,13 +113,17 @@ export class BMV extends LitElement {
   cancelHotspot() {
     const index = Object.keys(this.hotspotRenderer.hotspots).length;
     delete this.hotspotRenderer.hotspots[index];
-    if (this.currentHotspot) this.scene.remove(this.currentHotspot);
+    if (this.lastCreatedHotspot) this.scene.remove(this.lastCreatedHotspot);
     this.showHotspotConfig = false;
   }
 
   onAddHotspot(e: AddHotspotEvent) {
-    this.currentHotspot = e.detail.hotspot;
+    this.lastCreatedHotspot = e.detail.hotspot;
     this.showHotspotConfig = true;
+  }
+
+  onClickedHotspot(e: HotspotClickEvent) {
+    this.focusedHotspot = true
   }
 
   onHotspotConfigSubmit(e: SubmitEvent) {
@@ -131,16 +142,23 @@ export class BMV extends LitElement {
     this.showHotspotConfig = false;
   }
 
+  cancelFocus() {
+    this.focusedHotspot = false
+  }
+
   static styles = viewerCss;
 
   render() {
     return html`
       <div id="viewerContainer">
         <div id="hotspotConfig">
-          <form @submit=${this.onHotspotConfigSubmit} id="configHotspotForm">
+          <div class="header">
+            <h3>Hotspot configuration</h3>
             <button @click=${this.cancelHotspot} class="cancelButton">
               Cancel
             </button>
+          </div>
+          <form @submit=${this.onHotspotConfigSubmit} id="configHotspotForm">
             <label for="title">Title</label>
             <input type="text" name="title" id="title" />
             <label for="desc">Description</label>
@@ -150,6 +168,9 @@ export class BMV extends LitElement {
         </div>
         <button @click=${this.onPlayButtonClick} class="playButton float">
           ${this.playing ? pauseIcon : playIcon}
+        </button>
+        <button @click=${this.cancelFocus} id="cancelFocus" class="float">
+          ${closeIcon} Cancel focus
         </button>
         <div id="viewer"></div>
       </div>

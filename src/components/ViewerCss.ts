@@ -1,12 +1,13 @@
 import { css } from "lit";
 
 const viewerCss = css`
-  #viewerContainer {
+  #viewerContainer,
+  #viewer {
     width: 100%;
     height: 100%;
   }
 
-  #viewerContainer > input:focus,
+  #viewerContainer input:focus,
   select:focus,
   textarea:focus,
   button:focus {
@@ -15,42 +16,87 @@ const viewerCss = css`
 
   #viewerContainer #hotspotConfig {
     position: absolute;
-    width: 35vw;
-    max-width: 350px;
-    height: 100vh;
-    background-color: white;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    width: 50vw;
+    height: 50vh;
+    background-color: rgba(0,0,0, .75);
     z-index: 30005;
-    transition: right 0.5s;
+    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 20px;
+    border-radius: 15px;
+    // bottom property is set dynamically
   }
+
   #viewerContainer #hotspotConfig form {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    color: grey;
-    font-weight: 500;
+    color: white;
+    /* font-weight: 500; */
   }
   #viewerContainer #hotspotConfig form > input,
   textarea {
     margin-bottom: 20px;
-    padding: 5px;
-    border: none;
-    border-radius: 3px;
+    padding: 5px 10px;
+    border: solid 1px rgba(255,255,255, 0.5);
+    border-radius: 10px;
     font-family: unset;
-    background-color: lightgray;
-    color: black;
+    background-color: transparent;
+    color: yellow;
+    font-weight: 400;
+    font-size: 16px;
+    resize: none;
   }
+
+  #viewerContainer #hotspotConfig button {
+    border: none;
+    color: white;
+    background-color: transparent;
+  }
+  #viewerContainer #hotspotConfig button[type=submit] {
+    font-weight: bolder;
+  }
+
+  #viewerContainer #hotspotConfig .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: solid 1px rgba(255,255,255, 0.25);
+    color: white;
+    padding: 15px 20px;
+    background-color: transparent;
+  }
+
+  #viewerContainer #hotspotConfig .header button {
+    padding: 0;
+  }
+  #viewerContainer #hotspotConfig .header h3 {
+    padding: 0;
+    margin: 0;
+  }
+  
 
   #viewerContainer button {
     border: none;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 15px;
     padding: 5px 10px;
+    background-color: #aeaeae;
+  }
+
+  @media (hover: hover) {
+    #viewerContainer button:hover {
+      background-color: #bfbfbf;
+    }
+  }
+
+  #viewerContainer button:active {
+    background-color: #6f6f6f;
   }
 
   #viewerContainer button.float {
     position: absolute;
-    border-radius: 50%;
     z-index: 30000;
   }
 
@@ -60,22 +106,27 @@ const viewerCss = css`
     bottom: 0;
     right: 0;
     margin: 20px;
-    fill: #fff;
     padding: 8px 11px;
   }
-  #viewerContainer .cancelButton {
-    width: fit-content;
-    margin-bottom: 20px;
-  }
-
-  #viewerContainer .playButton > svg {
+  
+  #viewerContainer button > svg, path {
     height: 10px;
     width: 10px;
+    fill: white;
+    stroke: white;
   }
 
-  #viewer {
-    width: 100%;
-    height: 100%;
+  #viewerContainer button#cancelFocus.float {
+    background-color: transparent;
+    padding: 0;
+    color: white;
+    mix-blend-mode: difference; 
+    border-radius: 15px;
+    top: 0;
+    margin-top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: transform 0.25s;
   }
 `;
 

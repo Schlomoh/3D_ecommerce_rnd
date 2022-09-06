@@ -9,6 +9,7 @@ class Transitioner {
   private duration: number;
   private progress = 0;
   private step: number;
+  private camEndPos?: Vector3;
   _startCoords = { target: new Vector3(), camera: new Vector3() };
   finished = false;
 
@@ -55,8 +56,24 @@ class Transitioner {
     );
   }
 
-  linear(camEndPos: Vector3) {
+  private caller(alpha: number, endCoord: Vector3) {
     this.progress += this.step;
+
+    // new position reached - reset progress and disable focus
+    if (this.progress >= 1) {
+      this.progress = 0;
+      this.hotspot.focus = false;
+      return [endCoord, this.camEndPos]; // end position: ;
+    }
+    // else transition is ongoing
+    else {
+      const target = Transitioner.lerpVec3(this._startCoords.target, endCoord!, this.progress); // prettier-ignore
+      const newCamPosition = Transitioner.lerpVec3(this._startCoords.camera, this.camEndPos!, this.progress); // prettier-ignore
+      return [target, newCamPosition];
+    }
+  }
+
+  linear(camEndPos: Vector3) {
     const endTarget = this.hotspot.position.clone();
 
     // new position reached - reset progress and disable focus
@@ -73,23 +90,19 @@ class Transitioner {
     }
   }
 
-  ease(camEndPos: Vector3) {
+  ease(camEndPos: Vector3, endPos: Vector3) {
     this.progress += this.step;
     const alpha = Transitioner.easeInOut(this.progress);
-    const endTarget = this.hotspot.position.clone();
+    return this.caller(alpha, endPos);
+  }
 
-    // new position reached - reset progress and disable focus
-    if (alpha >= 1) {
-      this.progress = 0;
-      this.hotspot.focus = false;
-      return [endTarget, camEndPos]; // end position
-    }
-    // else transition is ongoing
-    else {
-      const target = Transitioner.lerpVec3(this._startCoords.target, endTarget, alpha); // prettier-ignore
-      const newCamPosition = Transitioner.lerpVec3(this._startCoords.camera, camEndPos, alpha); // prettier-ignore
-      return [target, newCamPosition];
-    }
+  focusHotspot(camEndPos: Vector3) {
+    const endTarget = this.hotspot.position.clone();
+    return this.ease(camEndPos, endTarget);
+  }
+
+  resetFocus(camEndPos: Vector3) {
+    return this.ease(camEndPos, new Vector3(0, 0, 0));
   }
 
   set startTarget(val: Vector3) {

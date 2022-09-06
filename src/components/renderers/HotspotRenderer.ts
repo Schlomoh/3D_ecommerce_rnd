@@ -70,6 +70,11 @@ class HotspotRenderer extends CSS2DRenderer {
     }
   }
 
+
+  resetFocus(){
+    
+  }
+
   /**
    * update hotspot visibility based on a raycast every frame
    * if the hit is close enough to the actual hotspot position it is shown
@@ -132,6 +137,7 @@ class HotspotRenderer extends CSS2DRenderer {
       const hotspot = this.hotspots[index];
       this.updateHotspotVisibility(hotspot);
       if (hotspot.focus) this.focusHotspot(hotspot);
+      else this.focusHotspot
     }
     this.controls.update();
   }

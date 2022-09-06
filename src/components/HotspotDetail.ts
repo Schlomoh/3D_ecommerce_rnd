@@ -7,12 +7,17 @@ const padding = 15;
 const baseStyle = `
     position: absolute;
     margin-left: calc(${width / 2}px + ${padding}px + 15px);
-    background-color: white;
-    border-radius: 5px;
+    background-color: rgba(0,0,0,.75);
+    border-radius: 10px;
     width: ${width}px;
-    color: black;
+    color: white;
     padding: ${padding}px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15)
+`;
+
+const titleStyle = `
+    margin-top: 0;
+    border-bottom: solid .5px lightgrey;
+    padding-bottom: 5px;
 `;
 
 class HotspotDetail extends CSS2DObject {
@@ -30,13 +35,13 @@ class HotspotDetail extends CSS2DObject {
     if (data.title) {
       const title = document.createElement("h3");
       title.innerText = data.title;
-      title.style.marginTop = '0'
+      title.style.cssText = titleStyle;
       element.appendChild(title);
     }
     if (data.desc) {
       const desc = document.createElement("p");
       desc.innerText = data.desc;
-      desc.style.marginTop = '0'
+      desc.style.marginTop = "0";
       element.appendChild(desc);
     }
 

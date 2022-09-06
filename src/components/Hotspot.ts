@@ -5,6 +5,14 @@ import HotspotDetail from "./HotspotDetail";
 import { HotspotRenderer } from "./renderers";
 import { Transitioner } from "./utils";
 
+export interface HotspotData {
+  title: string;
+  desc: string;
+  media: any;
+}
+
+export type HotspotClickEvent = CustomEvent<{ focused: boolean }>;
+
 const dotSize = 15;
 const baseStyle = `
   width: ${dotSize}px;
@@ -14,12 +22,6 @@ const baseStyle = `
   cursor: pointer;
   transition: background-color .5s, opacity .5s;
 `;
-
-export interface HotspotData {
-  title: string;
-  desc: string;
-  media: any;
-}
 
 class Hotspot extends CSS2DObject {
   private _show: boolean = true;
@@ -60,13 +62,18 @@ class Hotspot extends CSS2DObject {
     if (!this.focused) {
       if (this.renderer.prevHotspot) {
         this.renderer.prevHotspot.focused = false; // 'unfocus' previous hotspot
-        this.renderer.prevHotspot.detail?.updateVisibility(false)
+        this.renderer.prevHotspot.detail?.updateVisibility(false);
       }
       this.focus = true;
       this.focused = true;
       this.renderer.prevHotspot = this;
       this.transitioner.startTarget = this.controls.target.clone();
       this.transitioner.startCameraPos = this.camera.position.clone();
+
+      const event = new CustomEvent("clickedHotspot", {
+        detail: { focused: this.focused },
+      });
+      this.renderer.domElement.dispatchEvent(event);
 
       if (this.detail) {
         this.detail.updateVisibility(true);

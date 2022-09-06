@@ -1,12 +1,13 @@
 {
-  "name": "bmv-better-model-viewer",
+  "name": "bm-viewer",
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/my-element.es.js",
+  "main": "dist/cjs/bm-viewer.js",
+  "module": "dist/es/bm-viewer.js",
   "exports": {
-    ".": "./dist/my-element.es.js"
+    ".": "./dist/es/bm-viewer.js"
   },
-  "types": "types/my-element.d.ts",
+  "types": "dist/bm-viewer.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build"
@@ -14,14 +15,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@emotion/styled": "^11.10.0",
-    "@mui/joy": "^5.0.0-alpha.39",
     "lit": "^2.2.8",
     "three": "^0.143.0",
     "three-mesh-bvh": "^0.5.15"
   },
   "devDependencies": {
     "@types/three": "^0.143.0",
+    "terser": "^5.15.0",
     "typescript": "^4.7.4",
     "vite": "^3.0.4"
   }
