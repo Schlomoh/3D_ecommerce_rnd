@@ -11,8 +11,6 @@ export interface HotspotData {
   media: any;
 }
 
-export type HotspotClickEvent = CustomEvent<{ focused: boolean }>;
-
 const dotSize = 15;
 const baseStyle = `
   width: ${dotSize}px;
@@ -37,6 +35,7 @@ class Hotspot extends CSS2DObject {
 
   focus: boolean = false; // true while focusing
   focused: boolean = false; // true after focusing
+  reset: boolean = false; // true while reseting
   transitioner: Transitioner = new Transitioner(this, 0.8);
   hotspotElement: HTMLDivElement;
   associatedObject?: Object3D<Event>;
@@ -70,14 +69,14 @@ class Hotspot extends CSS2DObject {
       this.transitioner.startTarget = this.controls.target.clone();
       this.transitioner.startCameraPos = this.camera.position.clone();
 
-      const event = new CustomEvent("clickedHotspot", {
-        detail: { focused: this.focused },
-      });
-      this.renderer.domElement.dispatchEvent(event);
-
       if (this.detail) {
         this.detail.updateVisibility(true);
       }
+
+      const event = new CustomEvent("clickedHotspot", {
+        detail: { hotspot: this },
+      });
+      this.renderer.domElement.dispatchEvent(event);
     }
   }
 

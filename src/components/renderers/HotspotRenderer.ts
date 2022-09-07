@@ -64,15 +64,17 @@ class HotspotRenderer extends CSS2DRenderer {
         direction.normalize().multiplyScalar(-0.5)
       );
 
-      const [target, cameraPos] = hotspot.transitioner.ease(newCamPosition);
+      const [target, cameraPos] =
+        hotspot.transitioner.focusHotspot(newCamPosition);
       this.controls.target = target;
       this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
     }
   }
 
-
-  resetFocus(){
-    
+  resetFocus(hotspot: Hotspot) {
+    const [target, cameraPos] = hotspot.transitioner.resetFocus();
+    this.controls.target = target;
+    this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
   }
 
   /**
@@ -136,8 +138,9 @@ class HotspotRenderer extends CSS2DRenderer {
       const index = Number(Object.keys(this.hotspots)[i]); // get id from hotspot as index
       const hotspot = this.hotspots[index];
       this.updateHotspotVisibility(hotspot);
+      
       if (hotspot.focus) this.focusHotspot(hotspot);
-      else this.focusHotspot
+      else if (hotspot.reset) this.resetFocus(hotspot);
     }
     this.controls.update();
   }

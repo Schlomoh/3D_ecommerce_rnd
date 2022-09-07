@@ -75,7 +75,6 @@ const viewerCss = css`
     padding: 0;
     margin: 0;
   }
-  
 
   #viewerContainer button {
     border: none;
@@ -126,7 +125,7 @@ const viewerCss = css`
     margin-top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    transition: transform 0.25s;
+    transition: top 0.25s;
   }
 `;
 

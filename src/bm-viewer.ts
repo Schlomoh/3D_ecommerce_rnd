@@ -17,9 +17,8 @@ import {
 } from "./components";
 import { StyleUpdater } from "./components/utils";
 import closeIcon from "./assets/closeIconSvg";
-import { HotspotClickEvent } from "./components/Hotspot";
 
-type AddHotspotEvent = CustomEvent<{ hotspot: Hotspot }>;
+type HotspotEvent = CustomEvent<{ hotspot: Hotspot }>;
 
 @customElement("bm-viewer")
 export class BMV extends LitElement {
@@ -33,7 +32,8 @@ export class BMV extends LitElement {
   private showHotspotConfig = false;
 
   @state()
-  private focusedHotspot = false;
+  private focusing = false;
+  private focusedHotspot?: Hotspot;
 
   private animations: Animations;
   private scene: ModelScene = new ModelScene();
@@ -48,10 +48,12 @@ export class BMV extends LitElement {
     this.attachShadow({ mode: "open" });
 
     this.hotspotRenderer.domElement.addEventListener("addedHotspot", (e) =>
-      this.onAddHotspot(e as AddHotspotEvent)
+      this.onAddHotspot(e as HotspotEvent)
     );
 
-    this.hotspotRenderer.domElement.addEventListener('clickedHotspot', (e) => this.onClickedHotspot(e as HotspotClickEvent))
+    this.hotspotRenderer.domElement.addEventListener("clickedHotspot", (e) =>
+      this.onClickedHotspot(e as HotspotEvent)
+    );
 
     this.animations = this.scene.animationManager;
     this.styleUpdater = new StyleUpdater(this.shadowRoot);
@@ -90,12 +92,11 @@ export class BMV extends LitElement {
 
   protected updated(_changedProperties: PropertyValues): void {
     super.updated(_changedProperties);
-    console.log(this.showHotspotConfig);
 
     if (this.showHotspotConfig) this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '0px' );
     else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', 'calc(-50vw - 15px - 20px)'); // prettier-ignore
 
-    if (this.focusedHotspot)
+    if (this.focusing)
       this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
     else this.styleUpdater.updateStyle("cancelFocus", "top", "-50px");
   }
@@ -117,13 +118,14 @@ export class BMV extends LitElement {
     this.showHotspotConfig = false;
   }
 
-  onAddHotspot(e: AddHotspotEvent) {
+  onAddHotspot(e: HotspotEvent) {
     this.lastCreatedHotspot = e.detail.hotspot;
     this.showHotspotConfig = true;
   }
 
-  onClickedHotspot(e: HotspotClickEvent) {
-    this.focusedHotspot = true
+  onClickedHotspot(e: HotspotEvent) {
+    this.focusedHotspot = e.detail.hotspot;
+    this.focusing = true;
   }
 
   onHotspotConfigSubmit(e: SubmitEvent) {
@@ -143,7 +145,17 @@ export class BMV extends LitElement {
   }
 
   cancelFocus() {
-    this.focusedHotspot = false
+    if (this.focusedHotspot) {
+      this.focusedHotspot.focused = false;
+      this.focusing = false;
+      this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
+
+      this.focusedHotspot.transitioner.startCameraPos =
+        this.scene.camera.position;
+      this.focusedHotspot.transitioner.startTarget =
+        this.focusedHotspot.position;
+      this.focusedHotspot.reset = true;
+    }
   }
 
   static styles = viewerCss;
