@@ -1,9 +1,7 @@
 import { Raycaster } from "three";
 import { HotspotRenderer } from "../renderers";
-import Hotspot, { HotspotData } from "../Hotspot";
+import Hotspot, { HotspotDataEvent } from "../Hotspot";
 import HotspotDetail from "../HotspotDetail";
-
-type HotspotDataEvent = CustomEvent<{ data: HotspotData }>;
 
 class HotspotCreator {
   private renderer: HotspotRenderer;

@@ -11,15 +11,10 @@ export interface HotspotData {
   media: any;
 }
 
-const dotSize = 15;
-const baseStyle = `
-  width: ${dotSize}px;
-  height: ${dotSize}px;
-  border-radius: 50%;
-  border: solid 1px white;
-  cursor: pointer;
-  transition: background-color .5s, opacity .5s;
-`;
+export type HotspotEvent = CustomEvent<{ hotspot: Hotspot }>;
+export type HotspotDataEvent = CustomEvent<{ data: HotspotData }>;
+
+const background = { show: "black", hide: "rgba(0,0,0, 0.1)" };
 
 class Hotspot extends CSS2DObject {
   private _show: boolean = true;
@@ -37,22 +32,27 @@ class Hotspot extends CSS2DObject {
   focused: boolean = false; // true after focusing
   reset: boolean = false; // true while reseting
   transitioner: Transitioner = new Transitioner(this, 0.8);
-  hotspotElement: HTMLDivElement;
   associatedObject?: Object3D<Event>;
   detail?: HotspotDetail;
 
   constructor(renderer: HotspotRenderer) {
     const element = document.createElement("div");
     element.className = "hotspot";
-    element.style.cssText = baseStyle;
+
     super(element);
 
     this.renderer = renderer;
     this.controls = this.renderer.controls;
     this.camera = this.renderer.scene.camera;
 
-    this.hotspotElement = element;
-    this.hotspotElement.addEventListener("pointerdown", () => this.onClick());
+    if (this.renderer.enumerateHotspots) {
+      const numberElement = document.createElement("p");
+      const count = Object.keys(this.renderer.hotspots).length + 1;
+      numberElement.innerText = String(count);
+      this.element.appendChild(numberElement);
+    }
+
+    this.element.addEventListener("pointerdown", () => this.onClick());
 
     this.updateStyle();
   }
@@ -81,8 +81,8 @@ class Hotspot extends CSS2DObject {
   }
 
   private updateStyle() {
-    this.hotspotElement.style.backgroundColor = this._show ? "rgba(0,0,0,0.25)" : "black"; //prettier-ignore
-    this.hotspotElement.style.opacity = this._show ? "1" : ".1";
+    this.element.style.backgroundColor = this._show ? background.show : background.hide; //prettier-ignore
+    this.element.style.opacity = this._show ? "1" : ".1";
   }
 
   connectTo(target: Object3D<Event>, intersection: Intersection) {

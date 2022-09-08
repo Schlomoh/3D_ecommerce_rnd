@@ -1,9 +1,11 @@
-- highlighting und mögliche nummerierung der hotspots einbauen
-- hinterlegung der hotspot nummerierung ermöglichen
+<!-- - highlighting und mögliche nummerierung der hotspots einbauen -->
+<!-- - hinterlegung der hotspot nummerierung ermöglichen -->
 - hotspot edit button
 - auto rotate bei ausgewähltem hotspot soll eingeschränkt oder aus sein
 - camera / control max/min zoom einschränkung
 - schatten für die scene einbauen
+- css aufteilung
+- seperieren der hotspot funktionalität von hauptklasse
 - auf geladenes modell scene propagation anwenden, sowohl scale als auch rotation (normalisierung)
 - animations auswahl (UI) einbauen
 - Beleuchtungs presets zur auswahl stellen 

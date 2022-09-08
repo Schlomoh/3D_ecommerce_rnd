@@ -21,9 +21,7 @@ const titleStyle = `
 `;
 
 class HotspotDetail extends CSS2DObject {
-  //   data: HotspotData;
   hotspot: Hotspot;
-  element: HTMLDivElement;
 
   constructor(hotspot: Hotspot) {
     const element = document.createElement("div");
@@ -45,9 +43,14 @@ class HotspotDetail extends CSS2DObject {
       element.appendChild(desc);
     }
 
+    const editButton = document.createElement("button");
+    editButton.innerText = "edit";
+
     super(element);
     this.hotspot = hotspot;
-    this.element = element;
+
+    editButton.onclick = () => {}
+
     this.updateVisibility(false);
   }
 

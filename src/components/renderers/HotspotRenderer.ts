@@ -15,15 +15,17 @@ import { HotspotCreator, WindowHandler } from "../utils";
 class HotspotRenderer extends CSS2DRenderer {
   protected camera: PerspectiveCamera;
   protected windowHandler: WindowHandler;
-  protected hotspotCreator: HotspotCreator;
   protected raycaster = new Raycaster();
+  protected hotspotCreator: HotspotCreator;
+
+  hotspots: { [key: number]: Hotspot };
+  enumerateHotspots: boolean = false;
   controls: OrbitControls;
   scene: ModelScene;
-  hotspots: { [key: number]: Hotspot };
   prevHotspot?: Hotspot;
   container?: HTMLElement;
 
-  constructor(scene: ModelScene) {
+  constructor(scene: ModelScene, enumerateHotspots?: boolean) {
     super();
     this.scene = scene;
     this.camera = scene.camera;
@@ -46,6 +48,8 @@ class HotspotRenderer extends CSS2DRenderer {
     // hotspots and raycasting
     this.hotspots = [];
     this.raycaster.firstHitOnly = true;
+
+    enumerateHotspots && (this.enumerateHotspots = true);
   }
 
   private focusHotspot(hotspot: Hotspot) {
@@ -138,7 +142,7 @@ class HotspotRenderer extends CSS2DRenderer {
       const index = Number(Object.keys(this.hotspots)[i]); // get id from hotspot as index
       const hotspot = this.hotspots[index];
       this.updateHotspotVisibility(hotspot);
-      
+
       if (hotspot.focus) this.focusHotspot(hotspot);
       else if (hotspot.reset) this.resetFocus(hotspot);
     }

@@ -17,13 +17,15 @@ import {
 } from "./components";
 import { StyleUpdater } from "./components/utils";
 import closeIcon from "./assets/closeIconSvg";
-
-type HotspotEvent = CustomEvent<{ hotspot: Hotspot }>;
+import { HotspotEvent } from "./components/Hotspot";
 
 @customElement("bm-viewer")
 export class BMV extends LitElement {
   @property({ type: String })
   modelSrc: string = "";
+
+  @property()
+  enumerateHotspots = true;
 
   @state()
   playing = false;
@@ -37,7 +39,10 @@ export class BMV extends LitElement {
 
   private animations: Animations;
   private scene: ModelScene = new ModelScene();
-  private hotspotRenderer = new HotspotRenderer(this.scene);
+  private hotspotRenderer = new HotspotRenderer(
+    this.scene,
+    this.enumerateHotspots
+  );
   private modelRenderer = new ModelRenderer(this.scene);
   private lastCreatedHotspot?: Hotspot;
   private styleUpdater: StyleUpdater;
@@ -140,7 +145,6 @@ export class BMV extends LitElement {
     this.hotspotRenderer.domElement.dispatchEvent(event);
 
     title.value = desc.value = "";
-
     this.showHotspotConfig = false;
   }
 
