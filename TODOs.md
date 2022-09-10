@@ -1,8 +1,14 @@
 <!-- - highlighting und mögliche nummerierung der hotspots einbauen -->
 <!-- - hinterlegung der hotspot nummerierung ermöglichen -->
-- hotspot edit button
-- auto rotate bei ausgewähltem hotspot soll eingeschränkt oder aus sein
+<!-- - hotspot edit button -->
+<!-- - fix focus reset on cancel -->
+<!-- - fix detail showing after clearing data -->
+<!-- - auto rotate bei ausgewähltem hotspot soll eingeschränkt oder aus sein -->
 - camera / control max/min zoom einschränkung
+- file loading from user
+- button for removing hotspot
+- button for editing hotspot without detail
+- json export
 - schatten für die scene einbauen
 - css aufteilung
 - seperieren der hotspot funktionalität von hauptklasse

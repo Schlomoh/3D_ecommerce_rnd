@@ -2,12 +2,18 @@ import { css } from "lit";
 
 const dotSize = 15;
 const contrast = css`greenyellow`;
+const hotspotDetail = {
+  width: 250,
+  padding: 15,
+};
 
 const viewerCss = css`
   #viewerContainer,
   #viewer {
+    position: relative;
     width: 100%;
     height: 100%;
+    overflow: hidden;
   }
 
   #viewer .hotspot {
@@ -30,6 +36,41 @@ const viewerCss = css`
     border-color: ${contrast};
   }
 
+  #viewer .hotspotDetail {
+    position: absolute;
+    margin-left: calc(
+      ${hotspotDetail.width / 2}px + ${hotspotDetail.padding}px + 15px
+    );
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 10px;
+    width: ${hotspotDetail.width}px;
+    color: white;
+    padding: ${hotspotDetail.padding}px;
+    transition: visibility 0.5s, opacity 0.5s;
+  }
+
+  #viewer .hotspotDetail .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  #viewer .hotspotDetail h3 {
+    margin: 0;
+  }
+
+  #viewer .hotspotDetail p {
+    border-top: solid 0.5px lightgrey;
+    margin-top: 10px;
+    padding-top: 15px;
+  }
+
+  #viewer .hotspotDetail h3,
+  #viewer .hotspotDetail p {
+    word-break: break-all;
+    line-break: auto;
+  }
+
   input:focus,
   select:focus,
   textarea:focus,
@@ -42,6 +83,7 @@ const viewerCss = css`
     left: 50%;
     transform: translateX(-50%);
     width: 50vw;
+    min-width: 400px;
     height: 50vh;
     background-color: rgba(0, 0, 0, 0.75);
     border-radius: 15px;
@@ -77,6 +119,7 @@ const viewerCss = css`
     color: white;
     background-color: transparent;
   }
+
   #viewerContainer #hotspotConfig button[type="submit"] {
     font-weight: bolder;
   }
@@ -94,6 +137,7 @@ const viewerCss = css`
   #viewerContainer #hotspotConfig .header button {
     padding: 0;
   }
+
   #viewerContainer #hotspotConfig .header h3 {
     padding: 0;
     margin: 0;
@@ -105,6 +149,7 @@ const viewerCss = css`
     border-radius: 15px;
     padding: 5px 10px;
     background-color: #aeaeae;
+    z-index: 50000;
   }
 
   @media (hover: hover) {
@@ -139,12 +184,14 @@ const viewerCss = css`
     stroke: white;
   }
 
-  #viewerContainer button#cancelFocus.float {
+  #viewerContainer button.skeleton {
     background-color: transparent;
     padding: 0;
     color: white;
+  }
+
+  #viewerContainer button#cancelFocus {
     mix-blend-mode: difference;
-    border-radius: 15px;
     top: 0;
     margin-top: 20px;
     left: 50%;

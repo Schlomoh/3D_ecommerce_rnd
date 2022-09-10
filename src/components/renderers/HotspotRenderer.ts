@@ -4,7 +4,7 @@ import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
 import Hotspot from "../Hotspot";
 import ModelScene from "../ModelScene";
-import { HotspotCreator, WindowHandler } from "../utils";
+import { HotspotHandler, WindowHandler } from "../utils";
 
 /**
  * The 2D-renderer responsible for rendering the hotspot 2D-objects
@@ -16,8 +16,8 @@ class HotspotRenderer extends CSS2DRenderer {
   protected camera: PerspectiveCamera;
   protected windowHandler: WindowHandler;
   protected raycaster = new Raycaster();
-  protected hotspotCreator: HotspotCreator;
 
+  hotspotHandler: HotspotHandler;
   hotspots: { [key: number]: Hotspot };
   enumerateHotspots: boolean = false;
   controls: OrbitControls;
@@ -42,7 +42,7 @@ class HotspotRenderer extends CSS2DRenderer {
     this.controls.dampingFactor = 0.1;
 
     // register event handlers
-    this.hotspotCreator = new HotspotCreator(this);
+    this.hotspotHandler = new HotspotHandler(this);
     this.windowHandler = new WindowHandler(this);
 
     // hotspots and raycasting
@@ -138,6 +138,7 @@ class HotspotRenderer extends CSS2DRenderer {
    * calls 'focus hotspot' if one is clicked
    */
   update() {
+    let oneIsFocused = false;
     for (let i = 0; i < Object.keys(this.hotspots).length; i++) {
       const index = Number(Object.keys(this.hotspots)[i]); // get id from hotspot as index
       const hotspot = this.hotspots[index];
@@ -145,7 +146,10 @@ class HotspotRenderer extends CSS2DRenderer {
 
       if (hotspot.focus) this.focusHotspot(hotspot);
       else if (hotspot.reset) this.resetFocus(hotspot);
+      if (hotspot.focused) oneIsFocused = true;
     }
+    if (oneIsFocused) this.controls.autoRotate = false;
+    else this.controls.autoRotate = true;
     this.controls.update();
   }
 

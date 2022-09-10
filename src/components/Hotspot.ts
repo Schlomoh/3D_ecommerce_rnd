@@ -18,20 +18,20 @@ const background = { show: "black", hide: "rgba(0,0,0, 0.1)" };
 
 class Hotspot extends CSS2DObject {
   private _show: boolean = true;
-  private renderer: HotspotRenderer;
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
-
+  
   data: HotspotData = {
     title: "",
     desc: "",
     media: null,
   };
-
+  
   focus: boolean = false; // true while focusing
   focused: boolean = false; // true after focusing
   reset: boolean = false; // true while reseting
-  transitioner: Transitioner = new Transitioner(this, 0.8);
+  renderer: HotspotRenderer;
+  transitioner: Transitioner
   associatedObject?: Object3D<Event>;
   detail?: HotspotDetail;
 
@@ -44,6 +44,7 @@ class Hotspot extends CSS2DObject {
     this.renderer = renderer;
     this.controls = this.renderer.controls;
     this.camera = this.renderer.scene.camera;
+    this.transitioner = new Transitioner(this, 0.8);
 
     if (this.renderer.enumerateHotspots) {
       const numberElement = document.createElement("p");
@@ -58,6 +59,7 @@ class Hotspot extends CSS2DObject {
   }
 
   private onClick() {
+    console.log(this.id)
     if (!this.focused) {
       if (this.renderer.prevHotspot) {
         this.renderer.prevHotspot.focused = false; // 'unfocus' previous hotspot

@@ -61,6 +61,7 @@ class Transitioner {
     // new position reached - reset progress and disable focus
     if (this.progress >= 1) {
       this.progress = 0;
+      this.finished = true;
       this.hotspot.focus = false;
       this.hotspot.reset = false;
       return [endTarget, camEndPos]; // end position: ;
@@ -73,9 +74,9 @@ class Transitioner {
     }
   }
 
-  private linear(camEndPos: Vector3, endPos: Vector3) {
-    return this.transition(this.progress, camEndPos, endPos);
-  }
+  // private linear(camEndPos: Vector3, endPos: Vector3) {
+  //   return this.transition(this.progress, camEndPos, endPos);
+  // }
 
   private ease(camEndPos: Vector3, endTarget: Vector3) {
     const alpha = Transitioner.easeInOut(this.progress);
