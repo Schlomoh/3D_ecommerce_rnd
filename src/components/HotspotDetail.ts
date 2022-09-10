@@ -1,49 +1,50 @@
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import Hotspot from "./Hotspot";
 
-const width = 250;
-const padding = 15;
-
-const baseStyle = `
-    position: absolute;
-    margin-left: calc(${width / 2}px + ${padding}px + 15px);
-    background-color: white;
-    border-radius: 5px;
-    width: ${width}px;
-    color: black;
-    padding: ${padding}px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15)
-`;
-
 class HotspotDetail extends CSS2DObject {
-  //   data: HotspotData;
   hotspot: Hotspot;
-  element: HTMLDivElement;
 
   constructor(hotspot: Hotspot) {
     const element = document.createElement("div");
     element.className = "hotspotDetail";
-    element.style.cssText = baseStyle;
+    element.style.zIndex = '4000'
+
 
     const data = hotspot.data;
+
+    const header = document.createElement("div");
+    header.className = "header";
 
     if (data.title) {
       const title = document.createElement("h3");
       title.innerText = data.title;
-      title.style.marginTop = '0'
-      element.appendChild(title);
+      header.appendChild(title);
     }
+
+    const editButton = document.createElement("button");
+    editButton.className = 'skeleton'
+    editButton.addEventListener("pointerdown", (e) => this.onEdit(e));
+    editButton.innerText = "Edit";
+    header.appendChild(editButton);
+    element.appendChild(header);
+
     if (data.desc) {
       const desc = document.createElement("p");
       desc.innerText = data.desc;
-      desc.style.marginTop = '0'
       element.appendChild(desc);
     }
-
+    
     super(element);
     this.hotspot = hotspot;
-    this.element = element;
+
     this.updateVisibility(false);
+  }
+
+  onEdit(e: MouseEvent) {
+    const event = new CustomEvent("editHotspot", {
+      detail: { hotspot: this.hotspot },
+    });
+    this.hotspot.renderer.domElement.dispatchEvent(event);
   }
 
   connect() {
@@ -53,6 +54,7 @@ class HotspotDetail extends CSS2DObject {
 
   updateVisibility(show: boolean) {
     this.element.style.visibility = show ? "visible" : "hidden";
+    this.element.style.opacity = show ? "1" : "0";
   }
 }
 

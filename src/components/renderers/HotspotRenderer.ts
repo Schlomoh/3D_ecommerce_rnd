@@ -4,7 +4,7 @@ import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
 import Hotspot from "../Hotspot";
 import ModelScene from "../ModelScene";
-import { HotspotCreator, WindowHandler } from "../utils";
+import { HotspotHandler, WindowHandler } from "../utils";
 
 /**
  * The 2D-renderer responsible for rendering the hotspot 2D-objects
@@ -15,15 +15,17 @@ import { HotspotCreator, WindowHandler } from "../utils";
 class HotspotRenderer extends CSS2DRenderer {
   protected camera: PerspectiveCamera;
   protected windowHandler: WindowHandler;
-  protected hotspotCreator: HotspotCreator;
   protected raycaster = new Raycaster();
+
+  hotspotHandler: HotspotHandler;
+  hotspots: { [key: number]: Hotspot };
+  enumerateHotspots: boolean = false;
   controls: OrbitControls;
   scene: ModelScene;
-  hotspots: { [key: number]: Hotspot };
   prevHotspot?: Hotspot;
   container?: HTMLElement;
 
-  constructor(scene: ModelScene) {
+  constructor(scene: ModelScene, enumerateHotspots?: boolean) {
     super();
     this.scene = scene;
     this.camera = scene.camera;
@@ -40,12 +42,14 @@ class HotspotRenderer extends CSS2DRenderer {
     this.controls.dampingFactor = 0.1;
 
     // register event handlers
-    this.hotspotCreator = new HotspotCreator(this);
+    this.hotspotHandler = new HotspotHandler(this);
     this.windowHandler = new WindowHandler(this);
 
     // hotspots and raycasting
     this.hotspots = [];
     this.raycaster.firstHitOnly = true;
+
+    enumerateHotspots && (this.enumerateHotspots = true);
   }
 
   private focusHotspot(hotspot: Hotspot) {
@@ -64,10 +68,17 @@ class HotspotRenderer extends CSS2DRenderer {
         direction.normalize().multiplyScalar(-0.5)
       );
 
-      const [target, cameraPos] = hotspot.transitioner.ease(newCamPosition);
+      const [target, cameraPos] =
+        hotspot.transitioner.focusHotspot(newCamPosition);
       this.controls.target = target;
       this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
     }
+  }
+
+  resetFocus(hotspot: Hotspot) {
+    const [target, cameraPos] = hotspot.transitioner.resetFocus();
+    this.controls.target = target;
+    this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
   }
 
   /**
@@ -127,12 +138,18 @@ class HotspotRenderer extends CSS2DRenderer {
    * calls 'focus hotspot' if one is clicked
    */
   update() {
+    let oneIsFocused = false;
     for (let i = 0; i < Object.keys(this.hotspots).length; i++) {
       const index = Number(Object.keys(this.hotspots)[i]); // get id from hotspot as index
       const hotspot = this.hotspots[index];
       this.updateHotspotVisibility(hotspot);
+
       if (hotspot.focus) this.focusHotspot(hotspot);
+      else if (hotspot.reset) this.resetFocus(hotspot);
+      if (hotspot.focused) oneIsFocused = true;
     }
+    if (oneIsFocused) this.controls.autoRotate = false;
+    else this.controls.autoRotate = true;
     this.controls.update();
   }
 

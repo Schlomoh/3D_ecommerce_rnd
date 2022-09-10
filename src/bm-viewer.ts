@@ -15,13 +15,17 @@ import {
   Hotspot,
   viewerCss,
 } from "./components";
-
-type AddHotspotEvent = CustomEvent<{ hotspot: Hotspot }>;
+import { StyleUpdater } from "./components/utils";
+import closeIcon from "./assets/closeIconSvg";
+import { HotspotEvent } from "./components/Hotspot";
 
 @customElement("bm-viewer")
 export class BMV extends LitElement {
   @property({ type: String })
   modelSrc: string = "";
+
+  @property()
+  enumerateHotspots = true;
 
   @state()
   playing = false;
@@ -29,11 +33,15 @@ export class BMV extends LitElement {
   @state()
   private showHotspotConfig = false;
 
+  @state()
+  private focusing = false;
+
+  private selectedHotspot?: Hotspot;
   private animations: Animations;
+  private styleUpdater: StyleUpdater;
   private scene: ModelScene = new ModelScene();
-  private hotspotRenderer = new HotspotRenderer(this.scene);
+  private hotspotRenderer = new HotspotRenderer(this.scene, this.enumerateHotspots); // prettier-ignore
   private modelRenderer = new ModelRenderer(this.scene);
-  private currentHotspot?: Hotspot;
   private stats = Stats();
 
   constructor() {
@@ -41,10 +49,19 @@ export class BMV extends LitElement {
     this.attachShadow({ mode: "open" });
 
     this.hotspotRenderer.domElement.addEventListener("addedHotspot", (e) =>
-      this.onAddHotspot(e as AddHotspotEvent)
+      this.onAddHotspot(e as HotspotEvent)
     );
 
+    this.hotspotRenderer.domElement.addEventListener("clickedHotspot", (e) =>
+      this.onClickedHotspot(e as HotspotEvent)
+    );
+
+    this.hotspotRenderer.domElement.addEventListener("editHotspot", (e) => {
+      this.onAddHotspot(e as HotspotEvent);
+    });
+
     this.animations = this.scene.animationManager;
+    this.styleUpdater = new StyleUpdater(this.shadowRoot);
   }
 
   protected start() {
@@ -81,16 +98,19 @@ export class BMV extends LitElement {
   protected updated(_changedProperties: PropertyValues): void {
     super.updated(_changedProperties);
 
-    if (this.shadowRoot) {
-      const hotspotConfig = this.shadowRoot.getElementById("hotspotConfig");
-      if (hotspotConfig) {
-        if (this.showHotspotConfig) {
-          hotspotConfig.style.right = "0px";
-        } else if (!this.showHotspotConfig) {
-          hotspotConfig.style.right = "calc(0px - 35vw)";
-        }
-      }
-    }
+    if (this.showHotspotConfig) this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '0px' );
+    else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '-55vh'); // prettier-ignore
+
+    if (this.focusing)
+      this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
+    else this.styleUpdater.updateStyle("cancelFocus", "top", "-50px");
+  }
+
+  private getFormElements() {
+    const form = this.shadowRoot?.getElementById('configHotspotForm') as HTMLFormElement // prettier-ignore
+    const title = form.elements.namedItem("title") as HTMLInputElement;
+    const desc = form.elements.namedItem("desc") as HTMLTextAreaElement;
+    return { title: title, desc: desc };
   }
 
   onPlayButtonClick() {
@@ -103,32 +123,69 @@ export class BMV extends LitElement {
     this.playing = !this.playing;
   }
 
-  cancelHotspot() {
-    const index = Object.keys(this.hotspotRenderer.hotspots).length;
-    delete this.hotspotRenderer.hotspots[index];
-    if (this.currentHotspot) this.scene.remove(this.currentHotspot);
-    this.showHotspotConfig = false;
+  onAddHotspot(e: HotspotEvent) {
+    this.selectedHotspot = e.detail.hotspot;
+    this.showHotspotConfig = true;
+    if (this.selectedHotspot.detail) {
+      const inputs = this.getFormElements();
+      inputs.title.value = this.selectedHotspot.data.title;
+      inputs.desc.value = this.selectedHotspot.data.desc;
+    }
   }
 
-  onAddHotspot(e: AddHotspotEvent) {
-    this.currentHotspot = e.detail.hotspot;
-    this.showHotspotConfig = true;
+  cancelHotspotConfig() {
+    if (this.selectedHotspot?.focused) {
+      this.cancelFocus();
+    }
+
+    if (!this.selectedHotspot?.detail) {
+      if (this.selectedHotspot) {
+        this.scene.remove(this.selectedHotspot);
+        delete this.hotspotRenderer.hotspots[this.selectedHotspot.id];
+      }
+    }
+    this.showHotspotConfig = false;
   }
 
   onHotspotConfigSubmit(e: SubmitEvent) {
     e.preventDefault();
-    const form = this.shadowRoot?.getElementById('configHotspotForm') as HTMLFormElement // prettier-ignore
-    const title = form.elements.namedItem("title") as HTMLInputElement;
-    const desc = form.elements.namedItem("desc") as HTMLTextAreaElement;
+    const inputs = this.getFormElements();
 
-    const data = { title: title.value, desc: desc.value, media: null };
+    const data = {
+      title: inputs.title.value,
+      desc: inputs.desc.value,
+      media: null,
+    };
 
-    const event = new CustomEvent("submitHotspot", { detail: { data: data } });
+    this.selectedHotspot!.data = data;
+
+    const event = new CustomEvent("submitHotspot", {
+      detail: { hotspot: this.selectedHotspot },
+    });
     this.hotspotRenderer.domElement.dispatchEvent(event);
 
-    title.value = desc.value = "";
-
+    inputs.title.value = inputs.desc.value = "";
     this.showHotspotConfig = false;
+  }
+
+  onClickedHotspot(e: HotspotEvent) {
+    this.selectedHotspot = e.detail.hotspot;
+    this.focusing = true;
+  }
+
+  cancelFocus() {
+    if (this.selectedHotspot) {
+      0;
+      this.selectedHotspot.focused = false;
+      this.focusing = false;
+      this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
+
+      this.selectedHotspot.transitioner.startCameraPos =
+        this.scene.camera.position;
+      this.selectedHotspot.transitioner.startTarget =
+        this.selectedHotspot.position;
+      this.selectedHotspot.reset = true;
+    }
   }
 
   static styles = viewerCss;
@@ -137,19 +194,29 @@ export class BMV extends LitElement {
     return html`
       <div id="viewerContainer">
         <div id="hotspotConfig">
-          <form @submit=${this.onHotspotConfigSubmit} id="configHotspotForm">
-            <button @click=${this.cancelHotspot} class="cancelButton">
+          <div class="header">
+            <h3>Hotspot configuration</h3>
+            <button @click=${this.cancelHotspotConfig} class="cancelButton">
               Cancel
             </button>
+          </div>
+          <form @submit=${this.onHotspotConfigSubmit} id="configHotspotForm">
             <label for="title">Title</label>
             <input type="text" name="title" id="title" />
             <label for="desc">Description</label>
             <textarea id="desc" rows="10"></textarea>
-            <button type="submit">Add hotspot</button>
+            <button type="submit">Set hotspot detail</button>
           </form>
         </div>
         <button @click=${this.onPlayButtonClick} class="playButton float">
           ${this.playing ? pauseIcon : playIcon}
+        </button>
+        <button
+          @click=${this.cancelFocus}
+          class="float skeleton"
+          id="cancelFocus"
+        >
+          ${closeIcon} Cancel focus
         </button>
         <div id="viewer"></div>
       </div>

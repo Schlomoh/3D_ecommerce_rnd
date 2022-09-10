@@ -1,14 +1,23 @@
-<!-- - ausgewählter hotspot darf nicht nochmal ausgewählt werden -->
-- highlighting und mögliche nummerierung der hotspots einbauen
-- auto rotate bei ausgewähltem hotspot soll eingeschränkt oder aus sein
-- 'back button' bei ausgewähltem hotspot zur verfügung stellen - camera in ausgangs position
-- UI mit betätigungs button sobald hotspot erstellt wird
-- schatten für die scene einbauen
-- hinterlegung der hotspot nummerierung ermöglichen
-- auf geladenes modell scene propagation anwenden, sowohl scale als auch rotation (normalisierung)
+<!-- - highlighting und mögliche nummerierung der hotspots einbauen -->
+<!-- - hinterlegung der hotspot nummerierung ermöglichen -->
+<!-- - hotspot edit button -->
+<!-- - fix focus reset on cancel -->
+<!-- - fix detail showing after clearing data -->
+<!-- - auto rotate bei ausgewähltem hotspot soll eingeschränkt oder aus sein -->
 - camera / control max/min zoom einschränkung
-<!-- - ease-in-out interpolation bei Kamera Übergang umsetzen -->
+- file loading from user
+- button for removing hotspot
+- button for editing hotspot without detail
+- json export
+- schatten für die scene einbauen
+- css aufteilung
+- seperieren der hotspot funktionalität von hauptklasse
+- auf geladenes modell scene propagation anwenden, sowohl scale als auch rotation (normalisierung)
+- animations auswahl (UI) einbauen
 - Beleuchtungs presets zur auswahl stellen 
 - hdr support einbauen
 - tone-mappig einstellen
-- animations auswahl (UI) einbauen
+<!-- - ausgewählter hotspot darf nicht nochmal ausgewählt werden -->
+<!-- - UI mit betätigungs button sobald hotspot erstellt wird -->
+<!-- - ease-in-out interpolation bei Kamera Übergang umsetzen -->
+<!-- - 'back button' bei ausgewähltem hotspot zur verfügung stellen - camera in ausgangs position -->

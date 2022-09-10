@@ -1,15 +1,12 @@
 import { Raycaster } from "three";
 import { HotspotRenderer } from "../renderers";
-import Hotspot, { HotspotData } from "../Hotspot";
+import Hotspot, { HotspotDataEvent, HotspotEvent } from "../Hotspot";
 import HotspotDetail from "../HotspotDetail";
 
-type HotspotDataEvent = CustomEvent<{ data: HotspotData }>;
-
-class HotspotCreator {
+class HotspotHandler {
   private renderer: HotspotRenderer;
   private raycaster = new Raycaster();
   private domElement: HTMLElement;
-  private currentHotpot?: Hotspot;
 
   constructor(renderer: HotspotRenderer) {
     this.renderer = renderer;
@@ -20,7 +17,7 @@ class HotspotCreator {
     });
 
     this.domElement.addEventListener("submitHotspot", (e) => {
-      this.onSubmitHotspot(e as HotspotDataEvent);
+      this.onSubmitHotspot(e as HotspotEvent);
     });
 
     this.raycaster.firstHitOnly = true;
@@ -45,7 +42,6 @@ class HotspotCreator {
       // add hotspot to renderer
       const hotspot = new Hotspot(this.renderer);
       hotspots[hotspot.id] = hotspot;
-      this.currentHotpot = hotspot;
 
       // add hotspot to scene as object
       const firstIntersect = intersects[0];
@@ -59,16 +55,15 @@ class HotspotCreator {
     }
   }
 
-  private onSubmitHotspot(e: HotspotDataEvent) {
-    const data = e.detail.data;
-    this.currentHotpot!.data = data;
+  private onSubmitHotspot(e: HotspotEvent) {
+    const hotspot = e.detail.hotspot;
     // if no data is given no detail will be appended
-    if (data?.title || data?.desc || data?.media) {
-      const hotspotDetail = new HotspotDetail(this.currentHotpot!);
-      hotspotDetail.connect();
-      if (this.currentHotpot!.focused) hotspotDetail.updateVisibility(true); // show hotspot if already focused
-    }
+    const hotspotDetail = new HotspotDetail(hotspot);
+    // remove previous hotspot detail
+    if (hotspot.children.length > 0) hotspot.remove(hotspot.children[0]);
+    if (hotspot.data.title || hotspot.data.desc) hotspotDetail.connect();
+    if (hotspot.focused) hotspotDetail.updateVisibility(true); // show hotspot if already focused
   }
 }
 
-export default HotspotCreator;
+export default HotspotHandler;

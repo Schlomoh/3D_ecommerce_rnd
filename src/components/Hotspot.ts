@@ -5,62 +5,65 @@ import HotspotDetail from "./HotspotDetail";
 import { HotspotRenderer } from "./renderers";
 import { Transitioner } from "./utils";
 
-const dotSize = 15;
-const baseStyle = `
-  width: ${dotSize}px;
-  height: ${dotSize}px;
-  border-radius: 50%;
-  border: solid 1px white;
-  cursor: pointer;
-  transition: background-color .5s, opacity .5s;
-`;
-
 export interface HotspotData {
   title: string;
   desc: string;
   media: any;
 }
 
+export type HotspotEvent = CustomEvent<{ hotspot: Hotspot }>;
+export type HotspotDataEvent = CustomEvent<{ data: HotspotData }>;
+
+const background = { show: "black", hide: "rgba(0,0,0, 0.1)" };
+
 class Hotspot extends CSS2DObject {
   private _show: boolean = true;
-  private renderer: HotspotRenderer;
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
-
+  
   data: HotspotData = {
     title: "",
     desc: "",
     media: null,
   };
-
+  
   focus: boolean = false; // true while focusing
   focused: boolean = false; // true after focusing
-  transitioner: Transitioner = new Transitioner(this, 0.8);
-  hotspotElement: HTMLDivElement;
+  reset: boolean = false; // true while reseting
+  renderer: HotspotRenderer;
+  transitioner: Transitioner
   associatedObject?: Object3D<Event>;
   detail?: HotspotDetail;
 
   constructor(renderer: HotspotRenderer) {
     const element = document.createElement("div");
     element.className = "hotspot";
-    element.style.cssText = baseStyle;
+
     super(element);
 
     this.renderer = renderer;
     this.controls = this.renderer.controls;
     this.camera = this.renderer.scene.camera;
+    this.transitioner = new Transitioner(this, 0.8);
 
-    this.hotspotElement = element;
-    this.hotspotElement.addEventListener("pointerdown", () => this.onClick());
+    if (this.renderer.enumerateHotspots) {
+      const numberElement = document.createElement("p");
+      const count = Object.keys(this.renderer.hotspots).length + 1;
+      numberElement.innerText = String(count);
+      this.element.appendChild(numberElement);
+    }
+
+    this.element.addEventListener("pointerdown", () => this.onClick());
 
     this.updateStyle();
   }
 
   private onClick() {
+    console.log(this.id)
     if (!this.focused) {
       if (this.renderer.prevHotspot) {
         this.renderer.prevHotspot.focused = false; // 'unfocus' previous hotspot
-        this.renderer.prevHotspot.detail?.updateVisibility(false)
+        this.renderer.prevHotspot.detail?.updateVisibility(false);
       }
       this.focus = true;
       this.focused = true;
@@ -71,12 +74,17 @@ class Hotspot extends CSS2DObject {
       if (this.detail) {
         this.detail.updateVisibility(true);
       }
+
+      const event = new CustomEvent("clickedHotspot", {
+        detail: { hotspot: this },
+      });
+      this.renderer.domElement.dispatchEvent(event);
     }
   }
 
   private updateStyle() {
-    this.hotspotElement.style.backgroundColor = this._show ? "rgba(0,0,0,0.25)" : "black"; //prettier-ignore
-    this.hotspotElement.style.opacity = this._show ? "1" : ".1";
+    this.element.style.backgroundColor = this._show ? background.show : background.hide; //prettier-ignore
+    this.element.style.opacity = this._show ? "1" : ".1";
   }
 
   connectTo(target: Object3D<Event>, intersection: Intersection) {

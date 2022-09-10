@@ -55,34 +55,16 @@ class Transitioner {
     );
   }
 
-  linear(camEndPos: Vector3) {
+  private transition(alpha: number, camEndPos: Vector3, endTarget: Vector3) {
     this.progress += this.step;
-    const endTarget = this.hotspot.position.clone();
 
     // new position reached - reset progress and disable focus
     if (this.progress >= 1) {
       this.progress = 0;
+      this.finished = true;
       this.hotspot.focus = false;
+      this.hotspot.reset = false;
       return [endTarget, camEndPos]; // end position: ;
-    }
-    // else transition is ongoing
-    else {
-      const target = Transitioner.lerpVec3(this._startCoords.target, endTarget, this.progress); // prettier-ignore
-      const newCamPosition = Transitioner.lerpVec3(this._startCoords.camera, camEndPos, this.progress); // prettier-ignore
-      return [target, newCamPosition];
-    }
-  }
-
-  ease(camEndPos: Vector3) {
-    this.progress += this.step;
-    const alpha = Transitioner.easeInOut(this.progress);
-    const endTarget = this.hotspot.position.clone();
-
-    // new position reached - reset progress and disable focus
-    if (alpha >= 1) {
-      this.progress = 0;
-      this.hotspot.focus = false;
-      return [endTarget, camEndPos]; // end position
     }
     // else transition is ongoing
     else {
@@ -90,6 +72,24 @@ class Transitioner {
       const newCamPosition = Transitioner.lerpVec3(this._startCoords.camera, camEndPos, alpha); // prettier-ignore
       return [target, newCamPosition];
     }
+  }
+
+  // private linear(camEndPos: Vector3, endPos: Vector3) {
+  //   return this.transition(this.progress, camEndPos, endPos);
+  // }
+
+  private ease(camEndPos: Vector3, endTarget: Vector3) {
+    const alpha = Transitioner.easeInOut(this.progress);
+    return this.transition(alpha, camEndPos, endTarget);
+  }
+
+  focusHotspot(camEndPos: Vector3) {
+    const endTarget = this.hotspot.position.clone();
+    return this.ease(camEndPos, endTarget);
+  }
+
+  resetFocus() {
+    return this.ease(new Vector3(0, 0, -1), new Vector3(0, 0, 0));
   }
 
   set startTarget(val: Vector3) {
