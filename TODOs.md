@@ -4,14 +4,17 @@
 <!-- - fix focus reset on cancel -->
 <!-- - fix detail showing after clearing data -->
 <!-- - auto rotate bei ausgewähltem hotspot soll eingeschränkt oder aus sein -->
+- hotspot overview
+- visibility hotspots an/aus
 - camera / control max/min zoom einschränkung
 - file loading from user
 - button for removing hotspot
 - button for editing hotspot without detail
+- option for transparent background
 - json export
 - schatten für die scene einbauen
 - css aufteilung
-- seperieren der hotspot funktionalität von hauptklasse
+<!-- - separieren der hotspot funktionalität von hauptklasse -->
 - auf geladenes modell scene propagation anwenden, sowohl scale als auch rotation (normalisierung)
 - animations auswahl (UI) einbauen
 - Beleuchtungs presets zur auswahl stellen 

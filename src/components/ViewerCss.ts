@@ -2,6 +2,7 @@ import { css } from "lit";
 
 const dotSize = 15;
 const contrast = css`greenyellow`;
+const buttonHeight = 40;
 const hotspotDetail = {
   width: 250,
   padding: 15,
@@ -38,13 +39,12 @@ const viewerCss = css`
 
   #viewer .hotspotDetail {
     position: absolute;
-    margin-left: calc(
-      ${hotspotDetail.width / 2}px + ${hotspotDetail.padding}px + 15px
-    );
     background-color: rgba(0, 0, 0, 0.75);
     border-radius: 10px;
     width: ${hotspotDetail.width}px;
+    max-width: 75vw;
     color: white;
+    transform: translate(-50%, 15px);
     padding: ${hotspotDetail.padding}px;
     transition: visibility 0.5s, opacity 0.5s;
   }
@@ -78,19 +78,36 @@ const viewerCss = css`
     outline: none;
   }
 
-  #viewerContainer #hotspotConfig {
+  #viewerContainer .buttonGroup {
     position: absolute;
+    bottom: 0;
+    left: 0;
+    height: ${buttonHeight}px;
+    margin: 15px;
+    border-radius: ${buttonHeight / 2}px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    z-index: 30000;
+  }
+
+  #viewerContainer .buttonGroup .groupButton {
+    padding: 8px 20px;
+  }
+
+  #viewerContainer .settings {
+    position: absolute;
+    overflow: scroll;
     left: 50%;
     transform: translateX(-50%);
     width: 50vw;
     min-width: 400px;
-    height: 50vh;
+    max-height: calc(100vh - 40px);
     background-color: rgba(0, 0, 0, 0.75);
     border-radius: 15px;
-    margin-bottom: 20px;
-    transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    margin-bottom: 15px;
     z-index: 30005;
-    // bottom property is set dynamically
+    transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   #viewerContainer #hotspotConfig form {
@@ -146,9 +163,8 @@ const viewerCss = css`
   #viewerContainer button {
     border: none;
     cursor: pointer;
-    border-radius: 15px;
     padding: 5px 10px;
-    background-color: #aeaeae;
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 50000;
   }
 
@@ -165,15 +181,16 @@ const viewerCss = css`
   #viewerContainer button.float {
     position: absolute;
     z-index: 30000;
+    border-radius: ${buttonHeight / 2}px;
   }
 
   #viewerContainer .playButton {
-    width: 30px;
-    height: 30px;
+    width: ${buttonHeight}px;
+    height: ${buttonHeight}px;
     bottom: 0;
     right: 0;
-    margin: 20px;
-    padding: 8px 11px;
+    margin: 15px;
+    padding: 13px 16px;
   }
 
   #viewerContainer button > svg,
@@ -193,7 +210,7 @@ const viewerCss = css`
   #viewerContainer button#cancelFocus {
     mix-blend-mode: difference;
     top: 0;
-    margin-top: 20px;
+    margin-top: 15px;
     left: 50%;
     transform: translateX(-50%);
     transition: top 0.25s;

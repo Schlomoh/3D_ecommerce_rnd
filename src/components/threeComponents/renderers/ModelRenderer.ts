@@ -1,6 +1,6 @@
 import { PerspectiveCamera, WebGLRenderer } from "three";
-import ModelScene from ".././ModelScene";
-import { WindowHandler } from ".././utils";
+import { WindowHandler } from "../../utils";
+import ModelScene from "../ModelScene";
 
 class ModelRenderer extends WebGLRenderer {
   protected camera: PerspectiveCamera;
