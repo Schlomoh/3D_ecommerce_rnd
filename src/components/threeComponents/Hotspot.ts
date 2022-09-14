@@ -3,7 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import HotspotDetail from "./HotspotDetail";
 import { HotspotRenderer } from "./renderers";
-import { Transitioner } from "./utils";
+import { Transitioner } from "../utils";
 
 export interface HotspotData {
   title: string;

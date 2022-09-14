@@ -1,11 +1,11 @@
-import { AnimationAction, AnimationMixer, Event, Object3D } from "three";
+import { AnimationAction, AnimationMixer, Group, Object3D } from "three";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 
 class Animations {
   animationMixer: AnimationMixer | undefined;
   animationActions: AnimationAction[] = [];
 
-  init(rootModel: Object3D<Event>) {
+  init(rootModel: Object3D<Event> | Group): void {
     this.animationMixer = new AnimationMixer(rootModel);
   }
 

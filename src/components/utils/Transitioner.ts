@@ -1,6 +1,7 @@
 import { Vector3 } from "three";
 import { clamp } from "three/src/math/MathUtils";
-import Hotspot from "../Hotspot";
+
+import { Hotspot } from "../threeComponents";
 
 const FPS = 60;
 

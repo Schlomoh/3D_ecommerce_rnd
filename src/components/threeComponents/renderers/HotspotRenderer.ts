@@ -4,7 +4,7 @@ import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
 import Hotspot from "../Hotspot";
 import ModelScene from "../ModelScene";
-import { HotspotHandler, WindowHandler } from "../utils";
+import { HotspotHandler, WindowHandler } from "../../utils";
 
 /**
  * The 2D-renderer responsible for rendering the hotspot 2D-objects

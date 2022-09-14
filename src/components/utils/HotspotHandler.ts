@@ -1,7 +1,8 @@
 import { Raycaster } from "three";
-import { HotspotRenderer } from "../renderers";
-import Hotspot, { HotspotDataEvent, HotspotEvent } from "../Hotspot";
-import HotspotDetail from "../HotspotDetail";
+
+import { HotspotRenderer } from "../threeComponents/renderers";
+import { Hotspot, HotspotEvent } from "../threeComponents";
+import { HotspotDetail } from "../threeComponents";
 
 class HotspotHandler {
   private renderer: HotspotRenderer;
@@ -48,7 +49,7 @@ class HotspotHandler {
       hotspot.connectTo(this.renderer.scene, firstIntersect);
 
       // dispatch event for ui to show up
-      const event = new CustomEvent("addedHotspot", {
+      const event = new CustomEvent("showHotspotConfig", {
         detail: { hotspot: hotspot },
       });
       this.domElement.dispatchEvent(event);

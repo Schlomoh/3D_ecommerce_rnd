@@ -1,9 +1,10 @@
 import { PerspectiveCamera } from "three";
-import { HotspotRenderer, ModelRenderer } from "../renderers";
+import { HotspotRenderer, ModelRenderer } from "../threeComponents/renderers";
 
 class WindowHandler {
   renderer: HotspotRenderer | ModelRenderer;
   camera?: PerspectiveCamera;
+
   constructor(renderer: HotspotRenderer | ModelRenderer) {
     this.renderer = renderer;
     if (renderer instanceof ModelRenderer) this.camera = renderer.scene.camera;

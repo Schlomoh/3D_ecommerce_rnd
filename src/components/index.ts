@@ -1,7 +1,12 @@
-export { default as Loader } from "./Loader";
-export { default as ModelScene } from "./ModelScene";
-export { default as Hotspot } from "./Hotspot";
-export { default as HotspotDetail } from "./HotspotDetail";
-export { default as Animations } from "./Animations";
-export { ModelRenderer, HotspotRenderer } from "./renderers";
-export { default as viewerCss } from "./ViewerCss";
+export { HotspotConfig } from "./HotspotConfig";
+export { AnimationConfig } from "./AnimationConfig";
+export { ButtonGroup } from "./ButtonGroup";
+
+export {
+  ModelRenderer,
+  HotspotRenderer,
+  ModelScene,
+  Animations,
+  Hotspot,
+  type HotspotEvent,
+} from "./threeComponents";
