@@ -10,7 +10,7 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
 ): Constructor<HotspotConfigInterface> & T => {
   return class HotspotConfig extends BaseClass {
-    onShowHotspotConfig(e: HotspotEvent) {
+    private onShowHotspotConfig(e: HotspotEvent) {
       this.selectedHotspot = e.detail.hotspot;
       this.showHotspotConfig = true;
       // if the edit button was clicked
@@ -21,7 +21,7 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       }
     }
 
-    cancelHotspotConfig() {
+    private cancelHotspotConfig() {
       if (this.selectedHotspot?.focused) this.cancelFocus();
 
       if (!this.selectedHotspot?.detail) {
@@ -34,7 +34,7 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       this.showHotspotConfig = false;
     }
 
-    onHotspotConfigSubmit(e: SubmitEvent) {
+    private onHotspotConfigSubmit(e: SubmitEvent) {
       e.preventDefault();
       const { title, desc } = this.getFormElements();
 
@@ -65,7 +65,7 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       return { title: title, desc: desc };
     }
 
-    onClickedHotspot(e: HotspotEvent) {
+    private onClickedHotspot(e: HotspotEvent) {
       this.selectedHotspot = e.detail.hotspot;
       this.focusing = true;
     }
@@ -81,6 +81,15 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       this.hotspotRenderer.domElement.addEventListener("clickedHotspot", (e) =>
         this.onClickedHotspot(e as HotspotEvent)
       );
+    }
+
+    protected updated(_changedProperties: PropertyValues): void {
+      super.updated(_changedProperties);
+      const hotspotConfig = this.shadowRoot?.getElementById("hotspotConfig");
+      const hscfgHeight = hotspotConfig?.clientHeight;
+
+      if (this.showHotspotConfig) this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '0px' );
+      else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', `-${hscfgHeight! + 20}px`); // prettier-ignore
     }
 
     renderHotspotConfig() {

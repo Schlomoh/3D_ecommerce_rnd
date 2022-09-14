@@ -1,4 +1,7 @@
-export { default as viewerCss } from "./ViewerCss";
+export { HotspotConfig } from "./HotspotConfig";
+export { AnimationConfig } from "./AnimationConfig";
+export { ButtonGroup } from "./ButtonGroup";
+
 export {
   ModelRenderer,
   HotspotRenderer,

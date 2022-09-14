@@ -2,7 +2,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 import { ObjectModifications } from "../utils";
-import Animations from "./Animations";
+import {Animations} from "../threeComponents";
 import ModelScene from "./ModelScene";
 
 class Loader {

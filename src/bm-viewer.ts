@@ -1,9 +1,6 @@
-import { html, LitElement, PropertyValues, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { css, html, LitElement, PropertyValues } from "lit";
+import { property, state } from "lit/decorators.js";
 import { Clock } from "three";
-
-import playIcon from "./assets/playIconSvg";
-import pauseIcon from "./assets/pauseIconSvg";
 
 import Stats from "three/examples/jsm/libs/stats.module";
 
@@ -13,17 +10,26 @@ import {
   ModelScene,
   Animations,
   Hotspot,
-  viewerCss
+  AnimationConfig,
+  HotspotConfig,
+  ButtonGroup,
 } from "./components";
+
+import { StyleUpdater } from "./components/utils";
+
+import {
+  buttonGroupStyles,
+  animationStyles,
+  hotspotStyles,
+  viewerCss,
+} from "./components/styles";
+
+import closeIcon from "./assets/closeIconSvg";
 
 export type Constructor<T> = {
   new (...args: any[]): T;
   prototype: T;
 };
-
-import { StyleUpdater } from "./components/utils";
-import closeIcon from "./assets/closeIconSvg";
-import { HotspotConfigMixin } from "./components/HotspotConfig/HotspotConfig";
 
 export class BMVBase extends LitElement {
   @property({ type: String })
@@ -33,20 +39,23 @@ export class BMVBase extends LitElement {
   enumerateHotspots = true;
 
   @state()
-  playing = false;
-
-  @state()
-  protected showHotspotConfig = false;
+  protected playing = false;
 
   @state()
   protected focusing = false;
 
+  @state()
+  protected showAnimationConfig = false;
+
+  @state()
+  protected showHotspotConfig = false;
+
   protected selectedHotspot?: Hotspot;
-  private animations: Animations;
-  private styleUpdater: StyleUpdater;
+  protected animations: Animations;
+  protected styleUpdater: StyleUpdater;
   protected scene: ModelScene = new ModelScene();
   protected hotspotRenderer = new HotspotRenderer(this.scene, this.enumerateHotspots); // prettier-ignore
-  private modelRenderer = new ModelRenderer(this.scene);
+  protected modelRenderer = new ModelRenderer(this.scene);
   private stats = Stats();
 
   constructor() {
@@ -55,6 +64,27 @@ export class BMVBase extends LitElement {
 
     this.animations = this.scene.animationManager;
     this.styleUpdater = new StyleUpdater(this.shadowRoot);
+  }
+
+  protected firstUpdated(_changedProperties: PropertyValues): void {
+    super.firstUpdated(_changedProperties);
+    // wait for first update so the viewer wrapper element has been rendered
+    // and can be accessed
+    const container = this.shadowRoot?.getElementById("viewer")!;
+    // container.appendChild(this.stats.domElement);
+    this.hotspotRenderer.connect(container);
+    this.modelRenderer.connect(container);
+
+    this.scene.loadModel(this.modelSrc);
+
+    this.start();
+  }
+
+  protected updated(_changedProperties: PropertyValues): void {
+    super.updated(_changedProperties);
+    if (this.focusing)
+      this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
+    else this.styleUpdater.updateStyle("cancelFocus", "top", "-50px");
   }
 
   protected start() {
@@ -74,43 +104,6 @@ export class BMVBase extends LitElement {
     animate();
   }
 
-  protected firstUpdated(_changedProperties: PropertyValues): void {
-    super.firstUpdated(_changedProperties);
-    // wait for first update so the viewer wrapper element has been rendered
-    // and can be accessed
-    const container = this.shadowRoot?.getElementById("viewer")!;
-    // container.appendChild(this.stats.domElement);
-    this.hotspotRenderer.connect(container);
-    this.modelRenderer.connect(container);
-
-    this.scene.loadModel(this.modelSrc);
-
-    this.start();
-  }
-
-  protected updated(_changedProperties: PropertyValues): void {
-    super.updated(_changedProperties);
-    const hotspotConfig = this.shadowRoot?.getElementById("hotspotConfig");
-    const hscfgHeight = hotspotConfig?.clientHeight;
-
-    if (this.showHotspotConfig) this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '0px' );
-    else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', `-${hscfgHeight! + 20}px`); // prettier-ignore
-
-    if (this.focusing)
-      this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
-    else this.styleUpdater.updateStyle("cancelFocus", "top", "-50px");
-  }
-
-  onPlayButtonClick() {
-    if (this.playing) {
-      this.animations.animationActions[0].fadeOut(0.25);
-    } else {
-      this.animations.animationActions[0].stop();
-      this.animations.animationActions[0].play();
-    }
-    this.playing = !this.playing;
-  }
-
   cancelFocus() {
     if (this.selectedHotspot) {
       this.selectedHotspot.focused = false;
@@ -126,23 +119,15 @@ export class BMVBase extends LitElement {
     }
   }
 
-  showAnimationSettings() {}
-
-  static styles = viewerCss;
+  static styles = css`
+    ${viewerCss}
+    ${hotspotStyles}
+    ${buttonGroupStyles} 
+    ${animationStyles}
+  `;
 
   renderBase() {
     return html`
-      <div class="buttonGroup">
-        <button @click=${this.showAnimationSettings} class="groupButton">
-          Animations
-        </button>
-        <button class="groupButton">HDR settings</button>
-        <button class="groupButton">General</button>
-      </div>
-
-      <button @click=${this.onPlayButtonClick} class="playButton float">
-        ${this.playing ? pauseIcon : playIcon}
-      </button>
       <button
         @click=${this.cancelFocus}
         class="float skeleton"
@@ -168,16 +153,18 @@ export class BMVBase extends LitElement {
 //   });
 // }
 
-const Mixed = HotspotConfigMixin(BMVBase);
+const Mixed = ButtonGroup(HotspotConfig(AnimationConfig(BMVBase)));
 
 export class BMV extends Mixed {
   constructor() {
     super();
   }
+
   render() {
     return html`
       <div id="viewerContainer">
-        ${this.renderHotspotConfig()} ${this.renderBase()}
+        ${this.renderBase()} ${this.renderAnimationConfig()}
+        ${this.renderHotspotConfig()} ${this.renderButtonGroup()}
       </div>
     `;
   }
