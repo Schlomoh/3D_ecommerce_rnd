@@ -2,7 +2,7 @@ import { css, html, LitElement, PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import { Clock } from "three";
 
-import Stats from "three/examples/jsm/libs/stats.module";
+// import Stats from "three/examples/jsm/libs/stats.module";
 
 import {
   ModelRenderer,
@@ -23,8 +23,6 @@ import {
   hotspotStyles,
   viewerCss,
 } from "./components/styles";
-
-import closeIcon from "./assets/closeIconSvg";
 
 export type Constructor<T> = {
   new (...args: any[]): T;
@@ -59,8 +57,7 @@ export class BMVBase extends LitElement {
   protected scene: ModelScene = new ModelScene();
   protected hotspotRenderer = new HotspotRenderer(this.scene, this.enumerateHotspots); // prettier-ignore
   protected modelRenderer = new ModelRenderer(this.scene);
-
-  private stats = Stats();
+  // private stats = Stats();
 
   constructor() {
     super();
@@ -86,9 +83,6 @@ export class BMVBase extends LitElement {
 
   protected updated(_changedProperties: PropertyValues): void {
     super.updated(_changedProperties);
-    if (this.focusing)
-      this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
-    else this.styleUpdater.updateStyle("cancelFocus", "top", "-50px");
   }
 
   protected start() {
@@ -108,30 +102,8 @@ export class BMVBase extends LitElement {
     animate();
   }
 
-  cancelFocus() {
-    if (this.selectedHotspot) {
-      this.selectedHotspot.focused = false;
-      this.focusing = false;
-      this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
-
-      this.selectedHotspot.transitioner.startCameraPos =
-        this.scene.camera.position;
-      this.selectedHotspot.transitioner.startTarget =
-        this.selectedHotspot.position;
-
-      this.selectedHotspot.reset = true;
-    }
-  }
-
   renderBase() {
     return html`
-      <button
-        @click=${this.cancelFocus}
-        class="float skeleton"
-        id="cancelFocus"
-      >
-        ${closeIcon} Cancel focus
-      </button>
       <div id="viewer"></div>
     `;
   }

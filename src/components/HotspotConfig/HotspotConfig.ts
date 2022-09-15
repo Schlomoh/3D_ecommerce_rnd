@@ -1,6 +1,7 @@
 import { html, PropertyValues, TemplateResult } from "lit";
 import { BMVBase, Constructor } from "../../bm-viewer";
 import { HotspotEvent } from "../threeComponents";
+import closeIcon from "../../assets/closeIconSvg";
 
 export interface HotspotConfigInterface {
   renderHotspotConfig: () => TemplateResult;
@@ -70,6 +71,21 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       this.focusing = true;
     }
 
+    private cancelFocus() {
+      if (this.selectedHotspot) {
+        this.selectedHotspot.focused = false;
+        this.focusing = false;
+        this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
+
+        this.selectedHotspot.transitioner.startCameraPos =
+          this.scene.camera.position;
+        this.selectedHotspot.transitioner.startTarget =
+          this.selectedHotspot.position;
+
+        this.selectedHotspot.reset = true;
+      }
+    }
+
     protected firstUpdated(_changedProperties: PropertyValues): void {
       super.firstUpdated(_changedProperties);
 
@@ -89,11 +105,22 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       const hscfgHeight = hotspotConfig?.clientHeight;
 
       if (this.showHotspotConfig) this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '0px' );
-      else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', `-${hscfgHeight! + 20}px`); // prettier-ignore
+      else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', `-${hscfgHeight! + 40}px`); // prettier-ignore
+
+      if (this.focusing)
+        this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
+      else this.styleUpdater.updateStyle("cancelFocus", "top", "-50px");
     }
 
     renderHotspotConfig() {
       return html`
+        <button
+          @click=${this.cancelFocus}
+          class="float skeleton"
+          id="cancelFocus"
+        >
+          ${closeIcon} Cancel focus
+        </button>
         <div class="settings" id="hotspotConfig">
           <div class="header">
             <h3>Hotspot configuration</h3>

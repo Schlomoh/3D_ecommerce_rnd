@@ -12,7 +12,6 @@ export const viewerCss = css`
     overflow: hidden;
   }
 
-
   input:focus,
   select:focus,
   textarea:focus,
@@ -22,7 +21,7 @@ export const viewerCss = css`
 
   #viewerContainer .settings {
     position: absolute;
-    overflow: scroll;
+    overflow: hidden;
     left: 50%;
     transform: translateX(-50%);
     width: 50vw;
@@ -87,6 +86,7 @@ export const viewerCss = css`
     flex-direction: column;
     padding: 20px;
     color: white;
+    overflow-y: scroll;
     /* font-weight: 500; */
   }
 
@@ -113,7 +113,6 @@ export const viewerCss = css`
     z-index: 30000;
     border-radius: ${buttonHeight / 2}px;
   }
-
 
   #viewerContainer button > svg,
   path {

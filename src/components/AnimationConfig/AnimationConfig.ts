@@ -2,8 +2,7 @@ import { BMVBase, Constructor } from "../../bm-viewer";
 
 import playIcon from "../../assets/playIconSvg";
 import pauseIcon from "../../assets/pauseIconSvg";
-import { CSSResult, html, PropertyValues, TemplateResult } from "lit";
-import { styles } from "./styles";
+import { html, PropertyValues, TemplateResult } from "lit";
 
 export interface AnimationInteface {
   renderAnimationConfig: () => TemplateResult;
@@ -40,7 +39,7 @@ export const AnimationConfigMixin = <T extends Constructor<BMVBase>>(
         this.styleUpdater.updateStyle(
           "animationConfig",
           "bottom",
-          `-${animationConfigHeight! + 20}px`
+          `-${animationConfigHeight! + 40}px`
         );
     }
 
