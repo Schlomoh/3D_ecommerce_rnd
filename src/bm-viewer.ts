@@ -31,6 +31,9 @@ export type Constructor<T> = {
   prototype: T;
 };
 
+/**
+ * State handling and shadow dom creation connecting renderers
+ */
 export class BMVBase extends LitElement {
   @property({ type: String })
   modelSrc: string = "";
@@ -56,6 +59,7 @@ export class BMVBase extends LitElement {
   protected scene: ModelScene = new ModelScene();
   protected hotspotRenderer = new HotspotRenderer(this.scene, this.enumerateHotspots); // prettier-ignore
   protected modelRenderer = new ModelRenderer(this.scene);
+
   private stats = Stats();
 
   constructor() {
@@ -119,13 +123,6 @@ export class BMVBase extends LitElement {
     }
   }
 
-  static styles = css`
-    ${viewerCss}
-    ${hotspotStyles}
-    ${buttonGroupStyles} 
-    ${animationStyles}
-  `;
-
   renderBase() {
     return html`
       <button
@@ -140,25 +137,23 @@ export class BMVBase extends LitElement {
   }
 }
 
-// // This can live anywhere in your codebase:
-//
-// function applyMixins(base: any, constructors: any[]) {
-//   const getPropertyDesc = (proto: any, name: string) =>  Object.getOwnPropertyDescriptor(proto, name) || Object.create(null) // prettier-ignore
-//   const defineProperty = (baseProto: any, extProto: any , name: string) => // prettier-ignore
-//     (Object.defineProperty(baseProto, name, getPropertyDesc(extProto, name))) // prettier-ignore
-
-//   constructors.forEach((extendeeConstr) => {
-//     const propertyNames = Object.getOwnPropertyNames(extendeeConstr.prototype);
-//     propertyNames.forEach((name) => {defineProperty(base.prototype, extendeeConstr.prototype, name)}); // prettier-ignore
-//   });
-// }
-
 const Mixed = ButtonGroup(HotspotConfig(AnimationConfig(BMVBase)));
+
+/**
+ * Final class calling all the html rendering methods
+ */
 
 export class BMV extends Mixed {
   constructor() {
     super();
   }
+
+  static styles = css`
+    ${viewerCss}
+    ${hotspotStyles}
+    ${buttonGroupStyles} 
+    ${animationStyles}
+  `;
 
   render() {
     return html`
