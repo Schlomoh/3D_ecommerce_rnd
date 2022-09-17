@@ -53,39 +53,39 @@ class Hotspot extends CSS2DObject {
       this.element.appendChild(numberElement);
     }
 
-    this.element.addEventListener("pointerdown", () => this.onClick());
+    this.element.addEventListener("pointerdown", () => this.select());
 
     this.updateStyle();
   }
 
-  private onClick() {
-    console.log(this.id)
-    if (!this.focused) {
-      if (this.renderer.prevHotspot) {
-        this.renderer.prevHotspot.focused = false; // 'unfocus' previous hotspot
-        this.renderer.prevHotspot.detail?.updateVisibility(false);
-      }
-      this.focus = true;
-      this.focused = true;
-      this.renderer.prevHotspot = this;
-      this.transitioner.startTarget = this.controls.target.clone();
-      this.transitioner.startCameraPos = this.camera.position.clone();
-
-      if (this.detail) {
-        this.detail.updateVisibility(true);
-      }
-
-      const event = new CustomEvent("clickedHotspot", {
-        detail: { hotspot: this },
-      });
-      this.renderer.domElement.dispatchEvent(event);
-    }
-  }
-
+  
   private updateStyle() {
     this.element.style.backgroundColor = this._show ? background.show : background.hide; //prettier-ignore
     this.element.style.opacity = this._show ? "1" : ".1";
   }
+
+  select() {
+   if (!this.focused) {
+     if (this.renderer.prevHotspot) {
+       this.renderer.prevHotspot.focused = false; // 'unfocus' previous hotspot
+       this.renderer.prevHotspot.detail?.updateVisibility(false);
+     }
+     this.focus = true;
+     this.focused = true;
+     this.renderer.prevHotspot = this;
+     this.transitioner.startTarget = this.controls.target.clone();
+     this.transitioner.startCameraPos = this.camera.position.clone();
+
+     if (this.detail) {
+       this.detail.updateVisibility(true);
+     }
+
+     const event = new CustomEvent("clickedHotspot", {
+       detail: { hotspot: this },
+     });
+     this.renderer.domElement.dispatchEvent(event);
+   }
+ }
 
   connectTo(target: Object3D<Event>, intersection: Intersection) {
     const position = intersection.point;

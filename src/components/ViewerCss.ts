@@ -48,14 +48,21 @@ export const viewerCss = css`
     font-weight: bolder;
   }
 
-  #viewerContainer .settings .header {
+  #viewerContainer .header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    border-bottom: solid 1px rgba(255, 255, 255, 0.25);
     color: white;
+    background-color: none;
+  }
+
+  #viewerContainer .header h3 {
+    margin: 0;
+  }
+
+  #viewerContainer .settings .header {
     padding: 15px 20px;
-    background-color: transparent;
+    border-bottom: solid 1px rgba(255, 255, 255, 0.25);
   }
 
   #viewerContainer .settings .header button {
@@ -79,6 +86,16 @@ export const viewerCss = css`
     font-weight: 400;
     font-size: 16px;
     resize: none;
+  }
+
+  .flyin {
+    position: absolute;
+    top: 0;
+    width: 500px;
+    height: 100vh;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.75);
+    transition: right 0.5s;
   }
 
   #viewerContainer form {

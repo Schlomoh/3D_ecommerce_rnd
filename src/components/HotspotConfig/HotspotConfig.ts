@@ -7,6 +7,8 @@ export interface HotspotConfigInterface {
   renderHotspotConfig: () => TemplateResult;
 }
 
+const ID = "hotspotConfig";
+
 export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
 ): Constructor<HotspotConfigInterface> & T => {
@@ -77,12 +79,11 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
         this.focusing = false;
         this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
 
-        this.selectedHotspot.transitioner.startCameraPos =
-          this.scene.camera.position;
-        this.selectedHotspot.transitioner.startTarget =
-          this.selectedHotspot.position;
+        this.selectedHotspot.transitioner.startCameraPos = this.scene.camera.position; // prettier-ignore
+        this.selectedHotspot.transitioner.startTarget = this.selectedHotspot.position; // prettier-ignore
 
         this.selectedHotspot.reset = true;
+        this.showHotspotOverview = false;
       }
     }
 
@@ -104,8 +105,8 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       const hotspotConfig = this.shadowRoot?.getElementById("hotspotConfig");
       const hscfgHeight = hotspotConfig?.clientHeight;
 
-      if (this.showHotspotConfig) this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '0px' );
-      else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', `-${hscfgHeight! + 40}px`); // prettier-ignore
+      if (this.showHotspotConfig) this.styleUpdater.updateStyle(ID, 'bottom', '0px' );
+      else this.styleUpdater.updateStyle(ID, 'bottom', `-${hscfgHeight! + 40}px`); // prettier-ignore
 
       if (this.focusing)
         this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
@@ -121,7 +122,7 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
         >
           ${closeIcon} Cancel focus
         </button>
-        <div class="settings" id="hotspotConfig">
+        <div class="settings" id=${ID}>
           <div class="header">
             <h3>Hotspot configuration</h3>
             <button @click=${this.cancelHotspotConfig} class="cancelButton">

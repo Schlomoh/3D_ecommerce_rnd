@@ -22,7 +22,9 @@ import {
   animationStyles,
   hotspotStyles,
   viewerCss,
+  hotspotOverviewStyles,
 } from "./components/styles";
+import { HotspotOverview } from "./components/HotspotOverview";
 
 export type Constructor<T> = {
   new (...args: any[]): T;
@@ -47,9 +49,10 @@ export class BMVBase extends LitElement {
 
   @state()
   protected showAnimationConfig = false;
-
   @state()
   protected showHotspotConfig = false;
+  @state()
+  protected showHotspotOverview = false;
 
   protected selectedHotspot?: Hotspot;
   protected animations: Animations;
@@ -103,13 +106,13 @@ export class BMVBase extends LitElement {
   }
 
   renderBase() {
-    return html`
-      <div id="viewer"></div>
-    `;
+    return html` <div id="viewer"></div> `;
   }
 }
 
-const Mixed = ButtonGroup(HotspotConfig(AnimationConfig(BMVBase)));
+const Mixed = HotspotOverview(
+  ButtonGroup(HotspotConfig(AnimationConfig(BMVBase)))
+);
 
 /**
  * Final class calling all the html rendering methods
@@ -125,6 +128,7 @@ export class BMV extends Mixed {
     ${hotspotStyles}
     ${buttonGroupStyles} 
     ${animationStyles}
+    ${hotspotOverviewStyles}
   `;
 
   render() {
@@ -132,6 +136,7 @@ export class BMV extends Mixed {
       <div id="viewerContainer">
         ${this.renderBase()} ${this.renderAnimationConfig()}
         ${this.renderHotspotConfig()} ${this.renderButtonGroup()}
+        ${this.renderHotspotOverview()}
       </div>
     `;
   }

@@ -8,6 +8,8 @@ export interface AnimationInteface {
   renderAnimationConfig: () => TemplateResult;
 }
 
+const ID = "animationConfig";
+
 export const AnimationConfigMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
 ): Constructor<AnimationInteface> & T => {
@@ -29,18 +31,11 @@ export const AnimationConfigMixin = <T extends Constructor<BMVBase>>(
     protected updated(_changedProperties: PropertyValues): void {
       super.updated(_changedProperties);
 
-      const animationConfig =
-        this.shadowRoot?.getElementById("animationConfig");
-      const animationConfigHeight = animationConfig?.clientHeight;
+      const animationConfig = this.shadowRoot?.getElementById(ID);
+      const width = animationConfig?.clientHeight;
 
-      if (this.showAnimationConfig)
-        this.styleUpdater.updateStyle("animationConfig", "bottom", "0px");
-      else
-        this.styleUpdater.updateStyle(
-          "animationConfig",
-          "bottom",
-          `-${animationConfigHeight! + 40}px`
-        );
+      if (this.showAnimationConfig) this.styleUpdater.updateStyle(ID, "right", "0px");
+      else this.styleUpdater.updateStyle(ID, "right", `-${width! + 30}px`); // prettier-ignore
     }
 
     renderAnimationConfig() {
@@ -48,10 +43,10 @@ export const AnimationConfigMixin = <T extends Constructor<BMVBase>>(
         <button @click=${this.onPlayButtonClick} class="playButton float">
           ${this.playing ? pauseIcon : playIcon}
         </button>
-        <div class="settings" id="animationConfig">
+        <div class="flyin" id=${ID}>
           <div class="header">
             <h3>Animation configuration</h3>
-            <button @click=${this.cancelAnimationConfig} class="cancelButton">
+            <button @click=${this.cancelAnimationConfig} class="cancelButton skeleton">
               Cancel
             </button>
           </div>
