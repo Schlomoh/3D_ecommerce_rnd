@@ -12,7 +12,7 @@ const ID = "hotspotConfig";
 export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
 ): Constructor<HotspotConfigInterface> & T => {
-  return class HotspotConfig extends BaseClass {
+  class HotspotConfig extends BaseClass {
     private onShowHotspotConfig(e: HotspotEvent) {
       this.selectedHotspot = e.detail.hotspot;
       this.showHotspotConfig = true;
@@ -87,6 +87,8 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       }
     }
 
+    protected dataIsPresent() {}
+
     protected firstUpdated(_changedProperties: PropertyValues): void {
       super.firstUpdated(_changedProperties);
 
@@ -129,7 +131,11 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
               Cancel
             </button>
           </div>
-          <form @submit=${this.onHotspotConfigSubmit} id="configHotspotForm">
+          <form
+            @submit=${this.onHotspotConfigSubmit}
+            @change=${this.dataIsPresent}
+            id="configHotspotForm"
+          >
             <label for="title">Title</label>
             <input type="text" name="title" id="title" />
             <label for="desc">Description</label>
@@ -139,5 +145,6 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
         </div>
       `;
     }
-  };
+  }
+  return HotspotConfig; // if returned on declarating line, decorators wont work (retarded...)
 };

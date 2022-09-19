@@ -16,49 +16,66 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
       const hotspots = this.hotspotRenderer.hotspots;
       const indices = Object.keys(hotspots);
 
-      return (indices.length > 0) ? indices.map((index, i ) => {
-        const hotspot = hotspots[Number(index)];
+      const hotspotElements = indices.map((index, i) => {
+        const hotspot = hotspots[Number(index)] as Hotspot;
         return html`
-          <div  @click=${() => this.onHotspotCardClick(hotspot)} class="hotspotCard">
-          <p class='hotspotId'>${'Hotspot #' + (i + 1)}</p> 
-            <h3>${hotspot.data.title || "Hotspot ID: " + index}</h3>
-            <p>${hotspot.data.desc || 'No description was defined.'}</p>
+          <div
+            @click=${() => this.onHotspotCardClick(hotspot)}
+            class="hotspotCard"
+          >
+            <div class="header">
+              <p class="hotspotId">${"Hotspot #" + (i + 1)}</p>
+            </div>
+            <div class="cardContainer">
+              <h3>${hotspot.data.title || "ID-" + index + " (No title)"}</h3>
+              <p>${hotspot.data.desc || "No description defined."}</p>
+            </div>
           </div>
         `;
-      }) : html`<p><strong>No hotspots created yet.</strong></p>`
+      });
+
+      const elements =
+        indices.length > 0
+          ? hotspotElements
+          : html`<p><strong>No hotspots created yet.</strong></p>`;
+      return elements;
     }
 
     private onHotspotCardClick(hotspot: Hotspot) {
       this.showHotspotOverview = false;
-      hotspot.select()
+      hotspot.select();
     }
 
-    private cancelHotspotOverview () {
-      this.showHotspotOverview = false
+    private cancelHotspotOverview() {
+      this.showHotspotOverview = false;
     }
 
     protected updated(_changedProperties: PropertyValues): void {
       super.updated(_changedProperties);
 
-      const element = this.shadowRoot?.getElementById(ID)
-      const height = element?.clientHeight
-      
-      if (this.showHotspotOverview) this.styleUpdater.updateStyle(ID, 'right', '0px') // prettier-ignore
-      else this.styleUpdater.updateStyle(ID, 'right', `-${height! + 30}px` )
+      const element = this.shadowRoot?.getElementById(ID);
+      const height = element?.clientHeight;
+
+      if (this.showHotspotOverview)
+        this.styleUpdater.updateStyle(ID, "right", "0px");
+      else this.styleUpdater.updateStyle(ID, "right", `-${height! + 30}px`);
     }
 
     renderHotspotOverview() {
       return html`
-        <div class='flyin' id=${ID}>
-        <div class="header">
+        <div class="flyin" id=${ID}>
+          <div class="header">
             <h3>Hotspot overview</h3>
-            <button @click=${this.cancelHotspotOverview} class="cancelButton skeleton">
+            <button
+              @click=${this.cancelHotspotOverview}
+              class="cancelButton skeleton"
+            >
               Cancel
             </button>
           </div>
-          ${this.listHotspots()}
+          <div class="flyinContainer">${this.listHotspots()}</div>
         </div>
-      `
+      `;
     }
   };
 };

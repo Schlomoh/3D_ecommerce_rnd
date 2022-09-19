@@ -5,19 +5,22 @@ export const styles = css`
   }
 
   .hotspotCard {
-    padding: 15px;
     margin: 10px 0;
+    border: solid 1px rgba(255,255,255, 0.2);
     border-radius: 15px;
     background-color: rgba(0, 0, 0, 0.5);
     cursor: pointer;
   }
 
+  .cardContainer {
+    padding: 15px;
+  }
+
   .hotspotCard h3 {
     margin-top: 0;
-    border-bottom: solid 1px grey;
   }
 
   .hotspotCard .hotspotId {
-    margin-top: 0;
+    margin: 0;
   }
 `;

@@ -50,7 +50,6 @@ export const AnimationConfigMixin = <T extends Constructor<BMVBase>>(
               Cancel
             </button>
           </div>
-          <form stlye="height: 50px;">test</form>
         </div>
       `;
     }

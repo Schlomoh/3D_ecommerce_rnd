@@ -33,7 +33,7 @@ class ModelScene extends Scene {
     this.addPointLight("#3d5aff", { x: 1, y: 1, z: 0.7 });
     this.addPointLight("#fff", { x: 0, y: -1, z: -0.8 }, 0.3);
 
-    this.background = new Color("#fff");
+    this.background = new Color("#111");
   }
 
   private addPointLight(color: string, position: Vec3, intensity?: number) {

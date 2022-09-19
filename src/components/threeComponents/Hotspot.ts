@@ -44,7 +44,7 @@ class Hotspot extends CSS2DObject {
     this.renderer = renderer;
     this.controls = this.renderer.controls;
     this.camera = this.renderer.scene.camera;
-    this.transitioner = new Transitioner(this, 0.8);
+    this.transitioner = new Transitioner(this, 1);
 
     if (this.renderer.enumerateHotspots) {
       const numberElement = document.createElement("p");

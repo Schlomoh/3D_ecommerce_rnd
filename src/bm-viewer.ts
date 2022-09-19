@@ -2,7 +2,7 @@ import { css, html, LitElement, PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 import { Clock } from "three";
 
-// import Stats from "three/examples/jsm/libs/stats.module";
+import Stats from "three/examples/jsm/libs/stats.module";
 
 import {
   ModelRenderer,
@@ -60,7 +60,7 @@ export class BMVBase extends LitElement {
   protected scene: ModelScene = new ModelScene();
   protected hotspotRenderer = new HotspotRenderer(this.scene, this.enumerateHotspots); // prettier-ignore
   protected modelRenderer = new ModelRenderer(this.scene);
-  // private stats = Stats();
+  private stats = Stats();
 
   constructor() {
     super();
@@ -75,7 +75,7 @@ export class BMVBase extends LitElement {
     // wait for first update so the viewer wrapper element has been rendered
     // and can be accessed
     const container = this.shadowRoot?.getElementById("viewer")!;
-    // container.appendChild(this.stats.domElement);
+    container.appendChild(this.stats.domElement);
     this.hotspotRenderer.connect(container);
     this.modelRenderer.connect(container);
 
@@ -97,7 +97,7 @@ export class BMVBase extends LitElement {
         this.animations.animationMixer.update(clock.getDelta());
       }
 
-      // this.stats.update();
+      this.stats.update();
       this.hotspotRenderer.update();
       this.modelRenderer.render(this.scene, this.scene.camera);
       this.hotspotRenderer.render(this.scene, this.scene.camera);

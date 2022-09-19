@@ -26,7 +26,7 @@ export const ButtonGroupMixin = <T extends Constructor<BMVBase>>(
             Animations
           </button>
           <button @click=${this.onShowHotspotOverview} class="groupButton">
-            Hotspot overview
+            Hotspots
           </button>
           <button class="groupButton">HDR settings</button>
           <button class="groupButton">General</button>
