@@ -1,15 +1,18 @@
 import { html, PropertyValues, TemplateResult } from "lit";
 import { BMVBase, Constructor } from "../../bm-viewer";
 import { HotspotEvent } from "../threeComponents";
+import closeIcon from "../../assets/closeIconSvg";
 
 export interface HotspotConfigInterface {
   renderHotspotConfig: () => TemplateResult;
 }
 
+const ID = "hotspotConfig";
+
 export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
 ): Constructor<HotspotConfigInterface> & T => {
-  return class HotspotConfig extends BaseClass {
+  class HotspotConfig extends BaseClass {
     private onShowHotspotConfig(e: HotspotEvent) {
       this.selectedHotspot = e.detail.hotspot;
       this.showHotspotConfig = true;
@@ -70,6 +73,22 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       this.focusing = true;
     }
 
+    private cancelFocus() {
+      if (this.selectedHotspot) {
+        this.selectedHotspot.focused = false;
+        this.focusing = false;
+        this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
+
+        this.selectedHotspot.transitioner.startCameraPos = this.scene.camera.position; // prettier-ignore
+        this.selectedHotspot.transitioner.startTarget = this.selectedHotspot.position; // prettier-ignore
+
+        this.selectedHotspot.reset = true;
+        this.showHotspotOverview = false;
+      }
+    }
+
+    protected dataIsPresent() {}
+
     protected firstUpdated(_changedProperties: PropertyValues): void {
       super.firstUpdated(_changedProperties);
 
@@ -88,20 +107,35 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       const hotspotConfig = this.shadowRoot?.getElementById("hotspotConfig");
       const hscfgHeight = hotspotConfig?.clientHeight;
 
-      if (this.showHotspotConfig) this.styleUpdater.updateStyle('hotspotConfig', 'bottom', '0px' );
-      else this.styleUpdater.updateStyle('hotspotConfig', 'bottom', `-${hscfgHeight! + 20}px`); // prettier-ignore
+      if (this.showHotspotConfig) this.styleUpdater.updateStyle(ID, 'bottom', '0px' );
+      else this.styleUpdater.updateStyle(ID, 'bottom', `-${hscfgHeight! + 40}px`); // prettier-ignore
+
+      if (this.focusing)
+        this.styleUpdater.updateStyle("cancelFocus", "top", "0px");
+      else this.styleUpdater.updateStyle("cancelFocus", "top", "-50px");
     }
 
     renderHotspotConfig() {
       return html`
-        <div class="settings" id="hotspotConfig">
+        <button
+          @click=${this.cancelFocus}
+          class="float skeleton"
+          id="cancelFocus"
+        >
+          ${closeIcon} Cancel focus
+        </button>
+        <div class="settings" id=${ID}>
           <div class="header">
             <h3>Hotspot configuration</h3>
             <button @click=${this.cancelHotspotConfig} class="cancelButton">
               Cancel
             </button>
           </div>
-          <form @submit=${this.onHotspotConfigSubmit} id="configHotspotForm">
+          <form
+            @submit=${this.onHotspotConfigSubmit}
+            @change=${this.dataIsPresent}
+            id="configHotspotForm"
+          >
             <label for="title">Title</label>
             <input type="text" name="title" id="title" />
             <label for="desc">Description</label>
@@ -111,5 +145,6 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
         </div>
       `;
     }
-  };
+  }
+  return HotspotConfig; // if returned on declarating line, decorators wont work (retarded...)
 };

@@ -51,7 +51,7 @@ export const styles = css`
   }
 
   #viewer .hotspotDetail p {
-    border-top: solid 0.5px lightgrey;
+    border-top: solid 0.5px rgba(255, 255, 255, 0.2);
     margin-top: 10px;
     padding-top: 15px;
   }
