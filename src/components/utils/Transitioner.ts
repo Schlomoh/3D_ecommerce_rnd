@@ -1,20 +1,19 @@
 import { Vector3 } from "three";
 import { clamp } from "three/src/math/MathUtils";
-
-import { Hotspot } from "../threeComponents";
+import { Hotspot, HotspotRenderer } from "../threeComponents";
 
 const FPS = 60;
 
 class Transitioner {
-  private hotspot: Hotspot;
   private duration: number;
   private progress = 0;
   private step: number;
-  _startCoords = { target: new Vector3(), camera: new Vector3() };
-  finished = false;
 
-  constructor(hotspot: Hotspot, duration: number) {
-    this.hotspot = hotspot;
+  private renderer?: HotspotRenderer = undefined;
+
+  _startCoords = { target: new Vector3(), camera: new Vector3() };
+
+  constructor(duration: number) {
     this.duration = duration;
     this.step = 1 / (this.duration * FPS);
   }
@@ -56,15 +55,20 @@ class Transitioner {
     );
   }
 
-  private transition(alpha: number, camEndPos: Vector3, endTarget: Vector3) {
+  private transition(
+    alpha: number,
+    camEndPos: Vector3,
+    endTarget: Vector3,
+    hotspot?: Hotspot
+  ) {
     this.progress += this.step;
 
     // new position reached - reset progress and disable focus
     if (this.progress >= 1) {
+      if (hotspot) hotspot.focus = false;
+      else if (this.renderer) this.renderer.resettingFocus = false;
+
       this.progress = 0;
-      this.finished = true;
-      this.hotspot.focus = false;
-      this.hotspot.reset = false;
       return [endTarget, camEndPos]; // end position: ;
     }
     // else transition is ongoing
@@ -79,17 +83,18 @@ class Transitioner {
   //   return this.transition(this.progress, camEndPos, endPos);
   // }
 
-  private ease(camEndPos: Vector3, endTarget: Vector3) {
+  private ease(camEndPos: Vector3, endTarget: Vector3, hotspot?: Hotspot) {
     const alpha = Transitioner.easeInOut(this.progress);
-    return this.transition(alpha, camEndPos, endTarget);
+    return this.transition(alpha, camEndPos, endTarget, hotspot);
   }
 
-  focusHotspot(camEndPos: Vector3) {
-    const endTarget = this.hotspot.position.clone();
-    return this.ease(camEndPos, endTarget);
+  focusHotspot(hotspot: Hotspot, camEndPos: Vector3) {
+    const endTarget = hotspot.position.clone();
+    return this.ease(camEndPos, endTarget, hotspot);
   }
 
-  resetFocus() {
+  resetFocus(renderer: HotspotRenderer) {
+    this.renderer = renderer;
     return this.ease(new Vector3(0, 0, -1), new Vector3(0, 0, 0));
   }
 

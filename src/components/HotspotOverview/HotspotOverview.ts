@@ -11,44 +11,71 @@ const ID = "hotspotOverview";
 export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
 ): Constructor<HotspotOverviewInterface> & T => {
-  return class HotspotOverview extends BaseClass {
+  class HotspotOverview extends BaseClass {
+    private hotspots: Hotspot[] = [];
+
     private onHotspotCardClick(hotspot: Hotspot) {
       this.showHotspotOverview = false;
       hotspot.select();
     }
 
     private onClickRemove(hotspot: Hotspot) {
-      this.cancelFocus();
       hotspot.delete();
-      // this.update(new Map()); // to make ui rerender
+      this.getHotspotData(); // create updated hotspot array
+      // reset focus if currently focused hotspot is removed
+      if (hotspot.focused) this.cancelFocus();
+      this.showHotspotConfig = false;
+      this.requestUpdate(); // make ui rerender
+    }
+
+    private onClickEdit(hotspot: Hotspot) {
+      const event = new CustomEvent("showHotspotConfig", {
+        detail: { hotspot: hotspot },
+      });
+      hotspot.renderer.domElement.dispatchEvent(event);
+      hotspot.select();
     }
 
     private cancelHotspotOverview() {
       this.showHotspotOverview = false;
     }
 
-    private listHotspots() {
-      const hotspots = this.hotspotRenderer.hotspots;
-      const indices = Object.keys(hotspots);
+    private getHotspotData() {
+      const hotspotObject = this.hotspotRenderer.hotspots;
+      this.hotspots = Object.keys(hotspotObject).reduce((accu, key: string) => {
+        accu.push(hotspotObject[key as unknown as number]);
+        return accu;
+      }, [] as Hotspot[]);
+    }
 
-      const hotspotElements = indices.map((index, i) => {
-        const hotspot = hotspots[Number(index)] as Hotspot;
+    private listHotspots() {
+      const hotspotElements = this.hotspots.map((hotspot, i) => {
         return html`
           <div class="hotspotCard">
             <div class="header">
               <p class="hotspotId">${"Hotspot #" + (i + 1)}</p>
-              <button
-                @click=${() => this.onClickRemove(hotspot)}
-                class="cancelButton skeleton"
-              >
-                Remove
-              </button>
+              <div>
+                <button
+                  @click=${() => this.onClickEdit(hotspot)}
+                  class="cancelButton skeleton"
+                >
+                  Edit
+                </button>
+                <button
+                  @click=${() => this.onClickRemove(hotspot)}
+                  class="cancelButton skeleton"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
             <div
               class="cardContainer"
               @click=${() => this.onHotspotCardClick(hotspot)}
             >
-              <h3>${hotspot.data.title || "ID-" + index + " (No title)"}</h3>
+              <h3>
+                ${hotspot.data.title || "ID-" + hotspot.id + " (No title)"}
+              </h3>
               <p>${hotspot.data.desc || "No description defined."}</p>
             </div>
           </div>
@@ -56,7 +83,7 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
       });
 
       const elements =
-        indices.length > 0
+        this.hotspots.length > 0
           ? hotspotElements
           : html`<p><strong>No hotspots created yet.</strong></p>`;
       return elements;
@@ -64,6 +91,8 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
 
     protected updated(_changedProperties: PropertyValues): void {
       super.updated(_changedProperties);
+
+      this.getHotspotData();
 
       const element = this.shadowRoot?.getElementById(ID);
       const height = element?.clientHeight;
@@ -89,7 +118,8 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
         </div>
       `;
     }
-  };
+  }
+  return HotspotOverview;
 };
 
 export default HotspotOverviewMixin;

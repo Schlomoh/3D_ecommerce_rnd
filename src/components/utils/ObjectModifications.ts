@@ -39,6 +39,12 @@ class ObjectModifications {
 
     return object;
   }
+  
+  static enableShadows(object: Group, enableShadows: boolean) {
+    return object.traverseVisible((child: Object3D<Event>) => {
+      child.castShadow = enableShadows;
+    });
+  }
 }
 
 export default ObjectModifications;

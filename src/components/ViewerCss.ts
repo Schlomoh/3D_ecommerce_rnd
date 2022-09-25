@@ -96,7 +96,7 @@ export const viewerCss = css`
     top: 0;
     width: 500px;
     max-width: 80vw;
-    height: calc(100vh - 30px);
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.75);
     transition: right 0.5s;
     border-top-left-radius: 15px;
@@ -156,5 +156,6 @@ export const viewerCss = css`
     background-color: transparent;
     padding: 0;
     color: white;
+    margin-left: 15px;
   }
 `;

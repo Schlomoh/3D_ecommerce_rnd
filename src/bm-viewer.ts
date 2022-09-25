@@ -76,10 +76,10 @@ export class BMVBase extends LitElement {
       this.focusing = false;
       this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
 
-      this.selectedHotspot.transitioner.startCameraPos = this.scene.camera.position; // prettier-ignore
-      this.selectedHotspot.transitioner.startTarget = this.selectedHotspot.position; // prettier-ignore
+      this.hotspotRenderer.transitioner.startCameraPos = this.scene.camera.position; // prettier-ignore
+      this.hotspotRenderer.transitioner.startTarget = this.selectedHotspot.position; // prettier-ignore
 
-      this.selectedHotspot.reset = true;
+      this.hotspotRenderer.resettingFocus = true;
       this.showHotspotOverview = false;
     }
   }

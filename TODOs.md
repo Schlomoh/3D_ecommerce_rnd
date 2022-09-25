@@ -8,12 +8,12 @@
 - visibility hotspots an/aus
 - camera / control max/min zoom einschränkung
 - file loading from user
-- button for removing hotspot
-- button for editing hotspot without detail
+<!-- - button for removing hotspot -->
+<!-- - button for editing hotspot without detail -->
 - option for transparent background
 - json export
 - schatten für die scene einbauen
-- css aufteilung
+<!-- - css aufteilung -->
 <!-- - separieren der hotspot funktionalität von hauptklasse -->
 - auf geladenes modell scene propagation anwenden, sowohl scale als auch rotation (normalisierung)
 - animations auswahl (UI) einbauen
