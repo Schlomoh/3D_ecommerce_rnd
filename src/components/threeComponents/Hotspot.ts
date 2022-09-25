@@ -2,7 +2,7 @@ import { Event, Intersection, Object3D, PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import HotspotDetail from "./HotspotDetail";
-import { HotspotRenderer, ModelRenderer } from "./renderers";
+import { HotspotRenderer } from "./renderers";
 import { Transitioner } from "../utils";
 import ModelScene from "./ModelScene";
 
