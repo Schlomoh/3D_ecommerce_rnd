@@ -28,10 +28,7 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       if (this.selectedHotspot?.focused) this.cancelFocus();
 
       if (!this.selectedHotspot?.detail) {
-        if (this.selectedHotspot) {
-          this.scene.remove(this.selectedHotspot);
-          delete this.hotspotRenderer.hotspots[this.selectedHotspot.id];
-        }
+        this.selectedHotspot && this.selectedHotspot.delete();
       }
       this.resetForm();
       this.showHotspotConfig = false;
@@ -72,22 +69,6 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       this.selectedHotspot = e.detail.hotspot;
       this.focusing = true;
     }
-
-    private cancelFocus() {
-      if (this.selectedHotspot) {
-        this.selectedHotspot.focused = false;
-        this.focusing = false;
-        this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
-
-        this.selectedHotspot.transitioner.startCameraPos = this.scene.camera.position; // prettier-ignore
-        this.selectedHotspot.transitioner.startTarget = this.selectedHotspot.position; // prettier-ignore
-
-        this.selectedHotspot.reset = true;
-        this.showHotspotOverview = false;
-      }
-    }
-
-    protected dataIsPresent() {}
 
     protected firstUpdated(_changedProperties: PropertyValues): void {
       super.firstUpdated(_changedProperties);
@@ -131,11 +112,7 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
               Cancel
             </button>
           </div>
-          <form
-            @submit=${this.onHotspotConfigSubmit}
-            @change=${this.dataIsPresent}
-            id="configHotspotForm"
-          >
+          <form @submit=${this.onHotspotConfigSubmit} id="configHotspotForm">
             <label for="title">Title</label>
             <input type="text" name="title" id="title" />
             <label for="desc">Description</label>

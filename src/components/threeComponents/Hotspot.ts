@@ -2,8 +2,9 @@ import { Event, Intersection, Object3D, PerspectiveCamera } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import HotspotDetail from "./HotspotDetail";
-import { HotspotRenderer } from "./renderers";
+import { HotspotRenderer, ModelRenderer } from "./renderers";
 import { Transitioner } from "../utils";
+import ModelScene from "./ModelScene";
 
 export interface HotspotData {
   title: string;
@@ -18,20 +19,21 @@ const background = { show: "black", hide: "rgba(0,0,0, 0.1)" };
 
 class Hotspot extends CSS2DObject {
   private _show: boolean = true;
+  private scene: ModelScene;
   private camera: PerspectiveCamera;
   private controls: OrbitControls;
-  
+
   data: HotspotData = {
     title: "",
     desc: "",
     media: null,
   };
-  
+
   focus: boolean = false; // true while focusing
   focused: boolean = false; // true after focusing
   reset: boolean = false; // true while reseting
   renderer: HotspotRenderer;
-  transitioner: Transitioner
+  transitioner: Transitioner;
   associatedObject?: Object3D<Event>;
   detail?: HotspotDetail;
 
@@ -43,6 +45,7 @@ class Hotspot extends CSS2DObject {
 
     this.renderer = renderer;
     this.controls = this.renderer.controls;
+    this.scene = this.renderer.scene;
     this.camera = this.renderer.scene.camera;
     this.transitioner = new Transitioner(this, 1);
 
@@ -58,34 +61,38 @@ class Hotspot extends CSS2DObject {
     this.updateStyle();
   }
 
-  
   private updateStyle() {
     this.element.style.backgroundColor = this._show ? background.show : background.hide; //prettier-ignore
     this.element.style.opacity = this._show ? "1" : ".1";
   }
 
+  delete() {
+    this.scene.remove(this);
+    delete this.renderer.hotspots[this.id];
+  }
+
   select() {
-   if (!this.focused) {
-     if (this.renderer.prevHotspot) {
-       this.renderer.prevHotspot.focused = false; // 'unfocus' previous hotspot
-       this.renderer.prevHotspot.detail?.updateVisibility(false);
-     }
-     this.focus = true;
-     this.focused = true;
-     this.renderer.prevHotspot = this;
-     this.transitioner.startTarget = this.controls.target.clone();
-     this.transitioner.startCameraPos = this.camera.position.clone();
+    if (!this.focused) {
+      if (this.renderer.prevHotspot) {
+        this.renderer.prevHotspot.focused = false; // 'unfocus' previous hotspot
+        this.renderer.prevHotspot.detail?.updateVisibility(false);
+      }
+      this.focus = true;
+      this.focused = true;
+      this.renderer.prevHotspot = this;
+      this.transitioner.startTarget = this.controls.target.clone();
+      this.transitioner.startCameraPos = this.camera.position.clone();
 
-     if (this.detail) {
-       this.detail.updateVisibility(true);
-     }
+      if (this.detail) {
+        this.detail.updateVisibility(true);
+      }
 
-     const event = new CustomEvent("clickedHotspot", {
-       detail: { hotspot: this },
-     });
-     this.renderer.domElement.dispatchEvent(event);
-   }
- }
+      const event = new CustomEvent("clickedHotspot", {
+        detail: { hotspot: this },
+      });
+      this.renderer.domElement.dispatchEvent(event);
+    }
+  }
 
   connectTo(target: Object3D<Event>, intersection: Intersection) {
     const position = intersection.point;

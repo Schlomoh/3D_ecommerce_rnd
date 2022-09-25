@@ -12,6 +12,21 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
 ): Constructor<HotspotOverviewInterface> & T => {
   return class HotspotOverview extends BaseClass {
+    private onHotspotCardClick(hotspot: Hotspot) {
+      this.showHotspotOverview = false;
+      hotspot.select();
+    }
+
+    private onClickRemove(hotspot: Hotspot) {
+      this.cancelFocus();
+      hotspot.delete();
+      // this.update(new Map()); // to make ui rerender
+    }
+
+    private cancelHotspotOverview() {
+      this.showHotspotOverview = false;
+    }
+
     private listHotspots() {
       const hotspots = this.hotspotRenderer.hotspots;
       const indices = Object.keys(hotspots);
@@ -19,14 +34,20 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
       const hotspotElements = indices.map((index, i) => {
         const hotspot = hotspots[Number(index)] as Hotspot;
         return html`
-          <div
-            @click=${() => this.onHotspotCardClick(hotspot)}
-            class="hotspotCard"
-          >
+          <div class="hotspotCard">
             <div class="header">
               <p class="hotspotId">${"Hotspot #" + (i + 1)}</p>
+              <button
+                @click=${() => this.onClickRemove(hotspot)}
+                class="cancelButton skeleton"
+              >
+                Remove
+              </button>
             </div>
-            <div class="cardContainer">
+            <div
+              class="cardContainer"
+              @click=${() => this.onHotspotCardClick(hotspot)}
+            >
               <h3>${hotspot.data.title || "ID-" + index + " (No title)"}</h3>
               <p>${hotspot.data.desc || "No description defined."}</p>
             </div>
@@ -39,15 +60,6 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
           ? hotspotElements
           : html`<p><strong>No hotspots created yet.</strong></p>`;
       return elements;
-    }
-
-    private onHotspotCardClick(hotspot: Hotspot) {
-      this.showHotspotOverview = false;
-      hotspot.select();
-    }
-
-    private cancelHotspotOverview() {
-      this.showHotspotOverview = false;
     }
 
     protected updated(_changedProperties: PropertyValues): void {

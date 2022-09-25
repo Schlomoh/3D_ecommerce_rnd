@@ -138,7 +138,7 @@ class HotspotRenderer extends CSS2DRenderer {
    * calls 'focus hotspot' if one is clicked
    */
   update() {
-    let oneIsFocused = false;
+    let inFocus = false;
     for (let i = 0; i < Object.keys(this.hotspots).length; i++) {
       const index = Number(Object.keys(this.hotspots)[i]); // get id from hotspot as index
       const hotspot = this.hotspots[index];
@@ -146,9 +146,9 @@ class HotspotRenderer extends CSS2DRenderer {
 
       if (hotspot.focus) this.focusHotspot(hotspot);
       else if (hotspot.reset) this.resetFocus(hotspot);
-      if (hotspot.focused) oneIsFocused = true;
+      if (hotspot.focused) inFocus = true;
     }
-    if (oneIsFocused) this.controls.autoRotate = false;
+    if (inFocus) this.controls.autoRotate = false;
     else this.controls.autoRotate = true;
     this.controls.update();
   }

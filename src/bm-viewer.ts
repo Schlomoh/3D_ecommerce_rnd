@@ -70,6 +70,20 @@ export class BMVBase extends LitElement {
     this.styleUpdater = new StyleUpdater(this.shadowRoot);
   }
 
+  protected cancelFocus() {
+    if (this.selectedHotspot) {
+      this.selectedHotspot.focused = false;
+      this.focusing = false;
+      this.hotspotRenderer.prevHotspot?.detail?.updateVisibility(false);
+
+      this.selectedHotspot.transitioner.startCameraPos = this.scene.camera.position; // prettier-ignore
+      this.selectedHotspot.transitioner.startTarget = this.selectedHotspot.position; // prettier-ignore
+
+      this.selectedHotspot.reset = true;
+      this.showHotspotOverview = false;
+    }
+  }
+
   protected firstUpdated(_changedProperties: PropertyValues): void {
     super.firstUpdated(_changedProperties);
     // wait for first update so the viewer wrapper element has been rendered

@@ -4,7 +4,7 @@
 <!-- - fix focus reset on cancel -->
 <!-- - fix detail showing after clearing data -->
 <!-- - auto rotate bei ausgewähltem hotspot soll eingeschränkt oder aus sein -->
-- hotspot overview
+<!-- - hotspot overview -->
 - visibility hotspots an/aus
 - camera / control max/min zoom einschränkung
 - file loading from user
