@@ -1,9 +1,13 @@
 import {
   AmbientLight,
   Color,
+  DirectionalLight,
+  Mesh,
   PerspectiveCamera,
+  PlaneGeometry,
   PointLight,
   Scene,
+  ShadowMaterial,
 } from "three";
 import Animations from "./Animations";
 
@@ -33,13 +37,25 @@ class ModelScene extends Scene {
     this.addPointLight("#3d5aff", { x: 1, y: 1, z: 0.7 });
     this.addPointLight("#fff", { x: 0, y: -1, z: -0.8 }, 0.3);
 
-    this.background = new Color("#111");
+    const shadowLight = new DirectionalLight("#000", 1);
+    shadowLight.position.y = 25;
+    shadowLight.castShadow = true;
+    shadowLight.shadow.mapSize.width = 2048;
+    shadowLight.shadow.mapSize.height = 2048;
+    shadowLight.shadow.camera.left = -1;
+    shadowLight.shadow.camera.right = 1;
+    shadowLight.shadow.camera.top = 1;
+    shadowLight.shadow.camera.bottom = -1;
+    shadowLight.shadow.radius = 4;
+    this.add(shadowLight);
+
+    this.background = new Color("#ddd");
   }
 
   private addPointLight(color: string, position: Vec3, intensity?: number) {
     const newLight = new PointLight(color);
-    newLight.position.set(position.x, position.y, position.z);
     newLight.intensity = intensity ? intensity : 1;
+    newLight.position.set(position.x, position.y, position.z);
     this.add(newLight);
   }
 

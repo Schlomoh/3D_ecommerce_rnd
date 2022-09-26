@@ -1,7 +1,24 @@
-import { Box3, Event, Group, Mesh, Object3D, Vector3 } from "three";
+import {
+  Box3,
+  Event,
+  Group,
+  Mesh,
+  Object3D,
+  PlaneGeometry,
+  ShadowMaterial,
+  Vector3,
+} from "three";
 import { acceleratedRaycast, MeshBVH } from "three-mesh-bvh";
 
 class ObjectModifications {
+  private static getModelCenter(object: Group) {
+    const box = new Box3().setFromObject(object); // bounding box
+    const boxCenter = new Vector3();
+
+    box.getCenter(boxCenter);
+    return { center: boxCenter, min: box.min, max: box.max };
+  }
+
   static addBVH(object: Group) {
     function addBounds(child: Object3D<Event>) {
       if (child.type === "Mesh" || child.type === "SkinnedMesh") {
@@ -25,10 +42,8 @@ class ObjectModifications {
 
   static centerModel(object: Group) {
     // const bbox = new BoxHelper(object, '#fff'); // visible bounding box
-    const box = new Box3().setFromObject(object); // bounding box
-    const boxCenter = new Vector3();
+    const { center: boxCenter } = this.getModelCenter(object);
 
-    box.getCenter(boxCenter);
     const transformation = boxCenter.multiplyScalar(-1);
 
     object.translateX(transformation.x);
@@ -39,11 +54,25 @@ class ObjectModifications {
 
     return object;
   }
-  
+
   static enableShadows(object: Group, enableShadows: boolean) {
-    return object.traverseVisible((child: Object3D<Event>) => {
-      child.castShadow = enableShadows;
+    object.traverse((child: Object3D<Event>) => {
+      return (child.castShadow = enableShadows);
     });
+    return object;
+  }
+
+  static createShadowPlane(object: Group) {
+    const plane = new PlaneGeometry(100, 100);
+    const shadowMaterial = new ShadowMaterial({ color: 0x000, opacity: 0.2 });
+    const planeMesh = new Mesh(plane, shadowMaterial);
+
+    const { min } = this.getModelCenter(object);
+    
+    plane.rotateX(-Math.PI / 2);
+    planeMesh.translateY(min.y);
+    planeMesh.receiveShadow = true;
+    return planeMesh;
   }
 }
 

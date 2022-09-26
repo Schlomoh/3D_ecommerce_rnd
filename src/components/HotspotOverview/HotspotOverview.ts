@@ -15,15 +15,16 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
     private hotspots: Hotspot[] = [];
 
     private onHotspotCardClick(hotspot: Hotspot) {
-      this.showHotspotOverview = false;
       hotspot.select();
+      this.showHotspotOverview = false;
     }
 
     private onClickRemove(hotspot: Hotspot) {
-      hotspot.delete();
-      this.getHotspotData(); // create updated hotspot array
       // reset focus if currently focused hotspot is removed
-      if (hotspot.focused) this.cancelFocus();
+      hotspot.focused && this.cancelFocus();
+      hotspot.delete();
+
+      this.getHotspotData(); // create updated hotspot array
       this.showHotspotConfig = false;
       this.requestUpdate(); // make ui rerender
     }
@@ -95,11 +96,11 @@ export const HotspotOverviewMixin = <T extends Constructor<BMVBase>>(
       this.getHotspotData();
 
       const element = this.shadowRoot?.getElementById(ID);
-      const height = element?.clientHeight;
+      const width = element?.clientWidth;
 
       if (this.showHotspotOverview)
         this.styleUpdater.updateStyle(ID, "right", "0px");
-      else this.styleUpdater.updateStyle(ID, "right", `-${height! + 30}px`);
+      else this.styleUpdater.updateStyle(ID, "right", `-${width! + 30}px`);
     }
 
     renderHotspotOverview() {

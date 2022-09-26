@@ -13,6 +13,8 @@ import {
   AnimationConfig,
   HotspotConfig,
   ButtonGroup,
+  HotspotOverview,
+  GeneralSettings,
 } from "./components";
 
 import { StyleUpdater } from "./components/utils";
@@ -23,8 +25,8 @@ import {
   hotspotStyles,
   viewerCss,
   hotspotOverviewStyles,
+  generalSettingsStyles,
 } from "./components/styles";
-import { HotspotOverview } from "./components/HotspotOverview";
 
 export type Constructor<T> = {
   new (...args: any[]): T;
@@ -53,6 +55,8 @@ export class BMVBase extends LitElement {
   protected showHotspotConfig = false;
   @state()
   protected showHotspotOverview = false;
+  @state()
+  protected showGeneralSettings = false;
 
   protected selectedHotspot?: Hotspot;
   protected animations: Animations;
@@ -80,7 +84,6 @@ export class BMVBase extends LitElement {
       this.hotspotRenderer.transitioner.startTarget = this.selectedHotspot.position; // prettier-ignore
 
       this.hotspotRenderer.resettingFocus = true;
-      this.showHotspotOverview = false;
     }
   }
 
@@ -124,8 +127,8 @@ export class BMVBase extends LitElement {
   }
 }
 
-const Mixed = HotspotOverview(
-  ButtonGroup(HotspotConfig(AnimationConfig(BMVBase)))
+const Mixed = GeneralSettings(
+  HotspotOverview(ButtonGroup(HotspotConfig(AnimationConfig(BMVBase))))
 );
 
 /**
@@ -143,6 +146,7 @@ export class BMV extends Mixed {
     ${buttonGroupStyles} 
     ${animationStyles}
     ${hotspotOverviewStyles}
+    ${generalSettingsStyles}
   `;
 
   render() {
@@ -150,7 +154,7 @@ export class BMV extends Mixed {
       <div id="viewerContainer">
         ${this.renderBase()} ${this.renderAnimationConfig()}
         ${this.renderHotspotConfig()} ${this.renderButtonGroup()}
-        ${this.renderHotspotOverview()}
+        ${this.renderHotspotOverview()} ${this.renderGeneralSettings()}
       </div>
     `;
   }

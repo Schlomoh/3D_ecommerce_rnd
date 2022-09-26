@@ -5,7 +5,7 @@ export const styles = css`
   }
 
   .hotspotCard {
-    margin: 10px 0;
+    margin-bottom: 15px;
     border: solid 1px rgba(255, 255, 255, 0.2);
     border-radius: 15px;
     background-color: rgba(0, 0, 0, 0.5);

@@ -32,7 +32,7 @@ export const AnimationConfigMixin = <T extends Constructor<BMVBase>>(
       super.updated(_changedProperties);
 
       const animationConfig = this.shadowRoot?.getElementById(ID);
-      const width = animationConfig?.clientHeight;
+      const width = animationConfig?.clientWidth;
 
       if (this.showAnimationConfig) this.styleUpdater.updateStyle(ID, "right", "0px");
       else this.styleUpdater.updateStyle(ID, "right", `-${width! + 30}px`); // prettier-ignore
@@ -46,7 +46,10 @@ export const AnimationConfigMixin = <T extends Constructor<BMVBase>>(
         <div class="flyin" id=${ID}>
           <div class="header">
             <h3>Animation configuration</h3>
-            <button @click=${this.cancelAnimationConfig} class="cancelButton skeleton">
+            <button
+              @click=${this.cancelAnimationConfig}
+              class="cancelButton skeleton"
+            >
               Cancel
             </button>
           </div>

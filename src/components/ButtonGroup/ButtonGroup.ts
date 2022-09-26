@@ -10,13 +10,21 @@ export const ButtonGroupMixin = <T extends Constructor<BMVBase>>(
 ): Constructor<ButtonGroupInterface> & T => {
   return class ButtonGroup extends BaseClass {
     onShowAnimationConfig() {
-      this.showHotspotOverview = false
+      this.showGeneralSettings = false;
+      this.showHotspotOverview = false;
       this.showAnimationConfig = !this.showAnimationConfig;
     }
 
     onShowHotspotOverview() {
-      this.showAnimationConfig = false
+      this.showGeneralSettings = false;
+      this.showAnimationConfig = false;
       this.showHotspotOverview = !this.showHotspotOverview;
+    }
+
+    onShowGeneralSettings() {
+      this.showAnimationConfig = false;
+      this.showHotspotOverview = false;
+      this.showGeneralSettings = !this.showGeneralSettings;
     }
 
     renderButtonGroup() {
@@ -29,7 +37,9 @@ export const ButtonGroupMixin = <T extends Constructor<BMVBase>>(
             Hotspots
           </button>
           <button class="groupButton">HDR settings</button>
-          <button class="groupButton">General</button>
+          <button @click=${this.onShowGeneralSettings} class="groupButton">
+            General
+          </button>
         </div>
       `;
     }
