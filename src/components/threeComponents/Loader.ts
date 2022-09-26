@@ -25,11 +25,16 @@ class Loader {
     let model = gltf.scene;
     model = ObjectModifications.addBVH(gltf.scene);
     model = ObjectModifications.centerModel(model);
+    model = ObjectModifications.enableShadows(model, true)
+
+    const shadowPlane = ObjectModifications.createShadowPlane(model)
 
     this.animationManager.init(model);
     this.animationManager.readAnimations(gltf);
 
     this.scene.add(model);
+    this.scene.add(shadowPlane)
+
     this.scene.modelReady = true;
     // self.scene.add(gltf.scene);
   }

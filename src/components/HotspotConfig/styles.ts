@@ -3,7 +3,7 @@ import { contrast } from "../ViewerCss";
 
 const dotSize = 15;
 const hotspotDetail = {
-  width: 250,
+  width: 350,
   padding: 15,
 };
 

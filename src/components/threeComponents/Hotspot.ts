@@ -3,7 +3,6 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer";
 import HotspotDetail from "./HotspotDetail";
 import { HotspotRenderer } from "./renderers";
-import { Transitioner } from "../utils";
 import ModelScene from "./ModelScene";
 
 export interface HotspotData {
@@ -31,9 +30,7 @@ class Hotspot extends CSS2DObject {
 
   focus: boolean = false; // true while focusing
   focused: boolean = false; // true after focusing
-  reset: boolean = false; // true while reseting
   renderer: HotspotRenderer;
-  transitioner: Transitioner;
   associatedObject?: Object3D<Event>;
   detail?: HotspotDetail;
 
@@ -47,7 +44,6 @@ class Hotspot extends CSS2DObject {
     this.controls = this.renderer.controls;
     this.scene = this.renderer.scene;
     this.camera = this.renderer.scene.camera;
-    this.transitioner = new Transitioner(this, 1);
 
     if (this.renderer.enumerateHotspots) {
       const numberElement = document.createElement("p");
@@ -80,8 +76,8 @@ class Hotspot extends CSS2DObject {
       this.focus = true;
       this.focused = true;
       this.renderer.prevHotspot = this;
-      this.transitioner.startTarget = this.controls.target.clone();
-      this.transitioner.startCameraPos = this.camera.position.clone();
+      this.renderer.transitioner.startTarget = this.controls.target.clone();
+      this.renderer.transitioner.startCameraPos = this.camera.position.clone();
 
       if (this.detail) {
         this.detail.updateVisibility(true);

@@ -16,6 +16,7 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
     private onShowHotspotConfig(e: HotspotEvent) {
       this.selectedHotspot = e.detail.hotspot;
       this.showHotspotConfig = true;
+      this.showHotspotOverview = false;
       // if the edit button was clicked
       if (this.selectedHotspot.detail) {
         const { title, desc } = this.getFormElements();
@@ -88,8 +89,12 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
       const hotspotConfig = this.shadowRoot?.getElementById("hotspotConfig");
       const hscfgHeight = hotspotConfig?.clientHeight;
 
-      if (this.showHotspotConfig) this.styleUpdater.updateStyle(ID, 'bottom', '0px' );
-      else this.styleUpdater.updateStyle(ID, 'bottom', `-${hscfgHeight! + 40}px`); // prettier-ignore
+      if (this.showHotspotConfig)
+        this.styleUpdater.updateStyle(ID, "bottom", "0px");
+      else {
+        this.styleUpdater.updateStyle(ID, "bottom", `-${hscfgHeight! + 40}px`);
+        this.resetForm();
+      }
 
       if (this.focusing)
         this.styleUpdater.updateStyle("cancelFocus", "top", "0px");

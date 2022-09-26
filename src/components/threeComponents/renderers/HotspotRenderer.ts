@@ -4,7 +4,7 @@ import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer";
 
 import Hotspot from "../Hotspot";
 import ModelScene from "../ModelScene";
-import { HotspotHandler, WindowHandler } from "../../utils";
+import { HotspotHandler, Transitioner, WindowHandler } from "../../utils";
 
 /**
  * The 2D-renderer responsible for rendering the hotspot 2D-objects
@@ -17,9 +17,11 @@ class HotspotRenderer extends CSS2DRenderer {
   protected windowHandler: WindowHandler;
   protected raycaster = new Raycaster();
 
-  hotspotHandler: HotspotHandler;
-  hotspots: { [key: number]: Hotspot };
+  resettingFocus: boolean = false;
   enumerateHotspots: boolean = false;
+  hotspots: { [key: number]: Hotspot };
+  hotspotHandler: HotspotHandler;
+  transitioner: Transitioner;
   controls: OrbitControls;
   scene: ModelScene;
   prevHotspot?: Hotspot;
@@ -47,6 +49,7 @@ class HotspotRenderer extends CSS2DRenderer {
 
     // hotspots and raycasting
     this.hotspots = [];
+    this.transitioner = new Transitioner(1);
     this.raycaster.firstHitOnly = true;
 
     enumerateHotspots && (this.enumerateHotspots = true);
@@ -68,15 +71,17 @@ class HotspotRenderer extends CSS2DRenderer {
         direction.normalize().multiplyScalar(-0.5)
       );
 
-      const [target, cameraPos] =
-        hotspot.transitioner.focusHotspot(newCamPosition);
+      const [target, cameraPos] = this.transitioner.focusHotspot(
+        hotspot,
+        newCamPosition
+      );
       this.controls.target = target;
       this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
     }
   }
 
-  resetFocus(hotspot: Hotspot) {
-    const [target, cameraPos] = hotspot.transitioner.resetFocus();
+  resetFocus() {
+    const [target, cameraPos] = this.transitioner.resetFocus(this);
     this.controls.target = target;
     this.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
   }
@@ -145,11 +150,14 @@ class HotspotRenderer extends CSS2DRenderer {
       this.updateHotspotVisibility(hotspot);
 
       if (hotspot.focus) this.focusHotspot(hotspot);
-      else if (hotspot.reset) this.resetFocus(hotspot);
+      
       if (hotspot.focused) inFocus = true;
     }
+    if (this.resettingFocus) this.resetFocus();
+
     if (inFocus) this.controls.autoRotate = false;
     else this.controls.autoRotate = true;
+    
     this.controls.update();
   }
 

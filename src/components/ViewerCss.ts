@@ -96,7 +96,7 @@ export const viewerCss = css`
     top: 0;
     width: 500px;
     max-width: 80vw;
-    height: calc(100vh - 30px);
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.75);
     transition: right 0.5s;
     border-top-left-radius: 15px;
@@ -124,18 +124,18 @@ export const viewerCss = css`
     border: none;
     cursor: pointer;
     padding: 5px 10px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
     z-index: 50000;
   }
 
   @media (hover: hover) {
     button:hover {
-      background-color: #bfbfbf;
+      background-color: rgba(0, 0, 0, 0.5);
     }
   }
 
   button:active {
-    background-color: #6f6f6f;
+    background-color: rgba(0, 0, 0, 0.9);
   }
 
   button.float {
@@ -156,5 +156,6 @@ export const viewerCss = css`
     background-color: transparent;
     padding: 0;
     color: white;
+    margin-left: 15px;
   }
 `;

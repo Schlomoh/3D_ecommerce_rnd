@@ -10,6 +10,7 @@ class ModelRenderer extends WebGLRenderer {
 
   constructor(scene: ModelScene) {
     super({ antialias: true });
+    this.shadowMap.enabled = true
 
     this.container = document.createElement("div"); // placeholder element
     
