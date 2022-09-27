@@ -13,6 +13,19 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
 ): Constructor<HotspotConfigInterface> & T => {
   class HotspotConfig extends BaseClass {
+    private resetForm() {
+      const { title, desc } = this.getFormElements();
+      title.value = "";
+      desc.value = "";
+    }
+
+    private getFormElements() {
+      const form = this.shadowRoot?.getElementById('configHotspotForm') as HTMLFormElement // prettier-ignore
+      const title = form.elements.namedItem("title") as HTMLInputElement;
+      const desc = form.elements.namedItem("desc") as HTMLTextAreaElement;
+      return { title: title, desc: desc };
+    }
+
     private onShowHotspotConfig(e: HotspotEvent) {
       this.selectedHotspot = e.detail.hotspot;
       this.showHotspotConfig = true;
@@ -51,19 +64,6 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
 
       this.resetForm();
       this.showHotspotConfig = false;
-    }
-
-    private resetForm() {
-      const { title, desc } = this.getFormElements();
-      title.value = "";
-      desc.value = "";
-    }
-
-    private getFormElements() {
-      const form = this.shadowRoot?.getElementById('configHotspotForm') as HTMLFormElement // prettier-ignore
-      const title = form.elements.namedItem("title") as HTMLInputElement;
-      const desc = form.elements.namedItem("desc") as HTMLTextAreaElement;
-      return { title: title, desc: desc };
     }
 
     private onClickedHotspot(e: HotspotEvent) {

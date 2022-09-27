@@ -15,6 +15,7 @@ import {
   ButtonGroup,
   HotspotOverview,
   GeneralSettings,
+  BaseHotspotElements,
 } from "./components";
 
 import { StyleUpdater } from "./components/utils";
@@ -26,6 +27,7 @@ import {
   viewerCss,
   hotspotOverviewStyles,
   generalSettingsStyles,
+  baseHotspotElementStyles
 } from "./components/styles";
 
 export type Constructor<T> = {
@@ -42,6 +44,11 @@ export class BMVBase extends LitElement {
 
   @property()
   enumerateHotspots = true;
+
+  @property()
+  token: string = "";
+
+  //
 
   @state()
   protected playing = false;
@@ -127,8 +134,10 @@ export class BMVBase extends LitElement {
   }
 }
 
-const Mixed = GeneralSettings(
-  HotspotOverview(ButtonGroup(HotspotConfig(AnimationConfig(BMVBase))))
+const Mixed = BaseHotspotElements(
+  GeneralSettings(
+    HotspotOverview(ButtonGroup(HotspotConfig(AnimationConfig(BMVBase))))
+  )
 );
 
 /**
@@ -138,6 +147,17 @@ const Mixed = GeneralSettings(
 export class BMV extends Mixed {
   constructor() {
     super();
+  }
+
+  view() {
+    const viewer = html` ${this.renderBase()} `;
+    const editor = html`${viewer} ${this.renderAnimationConfig()}
+    ${this.renderHotspotConfig()} ${this.renderButtonGroup()}
+    ${this.renderHotspotOverview()} ${this.renderGeneralSettings()}`;
+
+    if (this.token === "editor") {
+      return editor;
+    } else return viewer;
   }
 
   static styles = css`
@@ -150,13 +170,7 @@ export class BMV extends Mixed {
   `;
 
   render() {
-    return html`
-      <div id="viewerContainer">
-        ${this.renderBase()} ${this.renderAnimationConfig()}
-        ${this.renderHotspotConfig()} ${this.renderButtonGroup()}
-        ${this.renderHotspotOverview()} ${this.renderGeneralSettings()}
-      </div>
-    `;
+    return html` <div id="viewerContainer">${this.view()}</div> `;
   }
 }
 
