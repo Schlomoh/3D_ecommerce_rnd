@@ -27,7 +27,7 @@ import {
   viewerCss,
   hotspotOverviewStyles,
   generalSettingsStyles,
-  baseHotspotElementStyles
+  baseHotspotElementStyles,
 } from "./components/styles";
 
 export type Constructor<T> = {
@@ -167,6 +167,7 @@ export class BMV extends Mixed {
     ${animationStyles}
     ${hotspotOverviewStyles}
     ${generalSettingsStyles}
+    ${baseHotspotElementStyles}
   `;
 
   render() {
