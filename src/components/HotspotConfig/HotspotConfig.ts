@@ -1,7 +1,6 @@
 import { html, PropertyValues, TemplateResult } from "lit";
 import { BMVBase, Constructor } from "../../bm-viewer";
 import { HotspotEvent } from "../threeComponents";
-import closeIcon from "../../assets/closeIconSvg";
 
 export interface HotspotConfigInterface {
   renderHotspotConfig: () => TemplateResult;
@@ -103,13 +102,6 @@ export const HotspotConfigMixin = <T extends Constructor<BMVBase>>(
 
     renderHotspotConfig() {
       return html`
-        <button
-          @click=${this.cancelFocus}
-          class="float skeleton"
-          id="cancelFocus"
-        >
-          ${closeIcon} Cancel focus
-        </button>
         <div class="settings" id=${ID}>
           <div class="header">
             <h3>Hotspot configuration</h3>

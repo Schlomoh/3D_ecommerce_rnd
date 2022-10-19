@@ -2,15 +2,12 @@ import {
   AmbientLight,
   Color,
   DirectionalLight,
-  Mesh,
   PerspectiveCamera,
-  PlaneGeometry,
   PointLight,
   Scene,
-  ShadowMaterial,
 } from "three";
-import Animations from "./Animations";
 
+import Animations from "./Animations";
 import Loader from "./Loader";
 
 interface Vec3 {

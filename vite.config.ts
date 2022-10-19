@@ -1,17 +1,19 @@
 import { defineConfig } from "vite";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  publicDir: false,
   build: {
-    // minify: 'terser',
+    outDir: "dist",
+    emptyOutDir: true,
     lib: {
-      name: "bm-viewer",
+      name: "BMV",
+      fileName: "bm-viewer",
       entry: "src/bm-viewer.ts",
-      formats: ["es"],
     },
     rollupOptions: {
-      // external: /^lit/
+      plugins: [nodeResolve()],
     },
   },
-  plugins: [],
 });

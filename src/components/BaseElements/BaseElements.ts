@@ -3,13 +3,13 @@ import { html } from "lit";
 import closeIcon from "../../assets/closeIconSvg";
 import { BMVBase, Constructor } from "../../bm-viewer";
 
-export interface BaseHotspotElementsInterface {}
+export interface BaseElementsInterface {}
 
-export const BaseHotspotMixin = <T extends Constructor<BMVBase>>(
+export const BaseElementMixin = <T extends Constructor<BMVBase>>(
   BaseClass: T
-): Constructor<BaseHotspotElementsInterface> & T => {
-  class BaseHotspotElements extends BaseClass {
-    renderBaseHotspotElements() {
+): Constructor<BaseElementsInterface> & T => {
+  class BaseElements extends BaseClass {
+    renderBaseElements() {
       return html`
         <button
           @click=${this.cancelFocus}
@@ -21,5 +21,5 @@ export const BaseHotspotMixin = <T extends Constructor<BMVBase>>(
       `;
     }
   }
-  return BaseHotspotElements;
+  return BaseElements;
 };

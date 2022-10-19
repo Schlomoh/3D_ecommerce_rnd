@@ -15,10 +15,8 @@ import {
   ButtonGroup,
   HotspotOverview,
   GeneralSettings,
-  BaseHotspotElements,
+  BaseElements,
 } from "./components";
-
-import { StyleUpdater } from "./components/utils";
 
 import {
   buttonGroupStyles,
@@ -27,8 +25,9 @@ import {
   viewerCss,
   hotspotOverviewStyles,
   generalSettingsStyles,
-  baseHotspotElementStyles
+  baseElementStyles,
 } from "./components/styles";
+import { StyleUpdater } from "./components/utils";
 
 export type Constructor<T> = {
   new (...args: any[]): T;
@@ -134,7 +133,7 @@ export class BMVBase extends LitElement {
   }
 }
 
-const Mixed = BaseHotspotElements(
+const Mixed = BaseElements(
   GeneralSettings(
     HotspotOverview(ButtonGroup(HotspotConfig(AnimationConfig(BMVBase))))
   )
@@ -143,8 +142,7 @@ const Mixed = BaseHotspotElements(
 /**
  * Final class calling all the html rendering methods
  */
-
-export class BMV extends Mixed {
+class BMV extends Mixed {
   constructor() {
     super();
   }
@@ -155,9 +153,7 @@ export class BMV extends Mixed {
     ${this.renderHotspotConfig()} ${this.renderButtonGroup()}
     ${this.renderHotspotOverview()} ${this.renderGeneralSettings()}`;
 
-    if (this.token === "editor") {
-      return editor;
-    } else return viewer;
+    return this.token === "editor" ? editor : viewer;
   }
 
   static styles = css`
@@ -167,6 +163,7 @@ export class BMV extends Mixed {
     ${animationStyles}
     ${hotspotOverviewStyles}
     ${generalSettingsStyles}
+    ${baseElementStyles}
   `;
 
   render() {
@@ -175,3 +172,4 @@ export class BMV extends Mixed {
 }
 
 customElements.define("bm-viewer", BMV);
+export default BMV;

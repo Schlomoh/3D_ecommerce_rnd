@@ -11,8 +11,8 @@ class Loader {
   private gltfLoader = new GLTFLoader();
   private dracoLoader = new DRACOLoader();
   private dracoDecoderPath =
-    // "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/";
-    "/decoder/draco/";
+    "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/";
+    // "/decoder/draco/";
 
   constructor(scene: ModelScene, animationManager: Animations) {
     this.scene = scene;
@@ -48,9 +48,3 @@ class Loader {
 }
 
 export default Loader;
-
-// get scene world position
-// get scene bounding box
-// get center of bounding box
-// transform world position to world center
-// transform center of scene to center of world
